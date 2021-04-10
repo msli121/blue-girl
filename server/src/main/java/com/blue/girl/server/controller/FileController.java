@@ -37,12 +37,12 @@ public class FileController {
         }
     }
 
-    /**
-     * 上传文件到服务器，保存在服务器本地
-     */
-    @PostMapping("/upload")
-    public ApiResult uploadFileToLocalServer(@RequestParam("file") MultipartFile file) {
-        return ApiResult.T(fileRecordService.uploadFileToLocalServer(file, downloadUrl));
-    }
+//    /**
+//     * 上传文件到服务器，保存在服务器本地
+//     */
+//    @PostMapping("/upload")
+//    public ApiResult uploadFileToLocalServer(@RequestParam("file") MultipartFile file) {
+//        return ApiResult.T(fileRecordService.uploadFileToLocalServer(file, downloadUrl));
+//    }
 
 }

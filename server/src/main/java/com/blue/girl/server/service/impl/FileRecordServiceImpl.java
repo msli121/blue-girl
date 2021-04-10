@@ -12,13 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 @Service("FileRecordServiceImpl")
 @Transactional(rollbackFor = Exception.class)
@@ -74,11 +72,10 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
                 toClient.flush();
             } catch (IOException e) {
                 e.printStackTrace();
-                PrintWriter toClient=response.getWriter();
-                response.setContentType("text/html;charset=utf8");
-                toClient.write("无法打开图片");
-                toClient.close();
+                throw new BusinessException("", "图片不存在");
             }
+        } else {
+            throw new BusinessException("", "图片不存在");
         }
     }
 
@@ -93,12 +90,11 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
         String os = System.getProperty("os.name");
         String fileRootDir;
         if(os.toLowerCase().startsWith("win")) {
-            fileRootDir = "C:"+ File.separator + "blue-girl" + File.separator + "upload-picture"
-                    + File.separator;
+            fileRootDir = "C:"+ File.separator + "blue-girl" + File.separator + "upload-picture";
         } else if(os.toLowerCase().contains("mac")) {
             fileRootDir = "/Users/liulin/Documents/blue-girl";
         } else {
-            fileRootDir = "/opt/blue-girl/upload-picture/";
+            fileRootDir = "/opt/blue-girl/upload-picture";
         }
         // 校验文件夹是否存在
         File folder = new File(fileRootDir);
@@ -119,6 +115,7 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
             fileRecord.setFileName(fileNewName);
             fileRecord.setLocalAddress(fileRootDir + File.separator + fileNewName);
             fileRecord.setUploadTime(new Timestamp(new Date().getTime()));
+            log.info("localAddress >>>>>>>>>>>>>>>>>>>> " + fileRecord.getLocalAddress());
             // 保存所有文件记录
             fileRecordDao.save(fileRecord);
             return downloadUrl + "/" + fileRecord.getId();
