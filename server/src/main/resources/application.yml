@@ -1,12 +1,13 @@
 server:
-  port: 8080
+  port: 8088
 
 spring:
+  profiles:
+    active: dev
   servlet:
     multipart:
       enabled: true
       file-size-threshold: 0
-      location: uploadFiles/
       max-file-size: 20MB
       max-request-size: 50MB
       resolve-lazily: false
@@ -20,6 +21,6 @@ spring:
 
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://106.15.204.9:3306/paper_web?characterEncoding=utf8mb4&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: ocr
-    password: Ocr@123456
+    url: jdbc:mysql://47.117.127.63:3306/blue_girl?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: blue_girl
+    password: Blue@123456
