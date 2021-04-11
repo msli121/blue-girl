@@ -21,7 +21,6 @@ import java.io.InputStream;
  * @Author msli
  * @Date 2021/04/09
  */
-
 @RestController
 @RequestMapping("/api/qr-code")
 public class QrCodeController {
@@ -39,6 +38,7 @@ public class QrCodeController {
     public void createQrCodeWithLogo(@RequestParam("file") MultipartFile file, HttpServletResponse response) throws Exception {
         ServletOutputStream outputStream = null;
         try {
+            response.setContentType("image/png");
             outputStream = response.getOutputStream();
             // 生成图片下载链接
             String code = fileRecordService.uploadFileToLocalServer(file, downloadUrl);
