@@ -11,8 +11,4 @@ html,body{
   padding: 0;
   margin: 0;
 }
-#app {
-  background-size:100% 100%;
-	position:absolute;
-}
 </style>
