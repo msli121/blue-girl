@@ -1,6 +1,6 @@
 <template>
   <el-carousel :interval="10000" trigger="click" :height="imgHeight">
-    <el-carousel-item v-for="item in cardList" :key="item">
+    <el-carousel-item v-for="item in cardList" :key="item.id">
       <img
         @click="select(item.name)"
         ref="imgH"
@@ -18,21 +18,24 @@ export default {
   name: "selectCard",
   data() {
     return {
-      imgHeight: 0,
+      imgHeight: "0px",
       cardList: [],
     };
   },
   created() {
     this.cardList = [
       {
+        id: 1,
         name: "blue_girl_home.jpg",
         value: require("../assets/blue_girl_home.jpg")
       },
       {
+        id: 2,
         name: "dzq_1.png",
         value: require("../assets/dzq_1.png")
       },
       {
+        id: 3,
         name: "blue_girl_home.jpg",
         value: require("../assets/blue_girl_home.jpg")
       }
