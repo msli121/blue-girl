@@ -75,8 +75,8 @@ public class QRCodeUtil {
             return image;
         }
         // 插入图片
-        Image src = ImageIO.read(inputStream);
-        QRCodeUtil.insertImage(image, src, needCompress);
+        Image logo = ImageIO.read(inputStream);
+        QRCodeUtil.insertImage(image, logo, needCompress);
         return image;
     }
 

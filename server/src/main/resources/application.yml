@@ -8,7 +8,7 @@ spring:
     multipart:
       enabled: true
       file-size-threshold: 0
-      max-file-size: 20MB
+      max-file-size: 40MB
       max-request-size: 50MB
       resolve-lazily: false
   jpa:
