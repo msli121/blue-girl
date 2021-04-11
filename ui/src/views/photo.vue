@@ -156,7 +156,7 @@ export default {
       // 获取图片base64链接
       var image = this.thisCancas.toDataURL("image/png");
       _this.imgSrc = image;
-      this.dataURLtoFile(_this.imgSrc, "test")
+      this.dataURLtoFile(_this.imgSrc, "groupPhoto.png")
       this.$emit("refreshDataList", this.imgSrc);
     },
     // base64转文件
@@ -182,15 +182,22 @@ export default {
     // 上传图片
     uploadFile() {
       let formData = new FormData();
+      console.log(this.file)
       formData.append("file", this.file);
+      console.log(formData)
       axios
-        .post("https://www.performercn.com/api/qr-code/code-logo", formData, {
+        .post("https://www.performercn.com/api/qr-code/code-url", formData, {
           "Content-Type": "multipart/form-data",
         })
         .then((res) => {
-          window.URL.createObjectURL(res)
-          console.log(window.URL.createObjectURL(res));
-          console.log(res);
+          if (res.data.flag === "T") {
+            this.$router.push({ path:'/download', query:{"src": res.data.data}});
+          } else {
+            this.$notify.error({
+              title: "错误",
+              message: `出错啦！重新尝试`,
+            });
+          }
         })
         .catch((err) => {
           console.log(err);

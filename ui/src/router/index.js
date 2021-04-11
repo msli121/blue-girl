@@ -22,6 +22,12 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/photo.vue"),
   },
+  {
+    path: "/download",
+    name: "download",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/download.vue"),
+  },
 ];
 
 const router = new VueRouter({
