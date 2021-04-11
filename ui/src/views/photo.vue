@@ -32,31 +32,56 @@
         class="dzq_img"
       />
     </div>
-    <button @click="getCompetence()">打开摄像头</button>
-    <button @click="stopNavigator()">关闭摄像头</button>
-    <button @click="setImage()">拍照</button>
+    <div class="confirm" v-if="confirmPhoto">
+      <!-- 重拍 -->
+      <el-button style="font-size:40px" @click="getCompetence()" circle icon="el-icon-camera" type="danger"></el-button>
+      <!-- 保存 -->
+      <el-button style="font-size:40px;margin-left:30px" @click="uploadFile()" circle icon="el-icon-download" type="success"></el-button>
+    </div>
+    <div class="confirm" v-else>
+      <!-- 拍照 -->
+      <el-button style="font-size:40px" @click="setImage()" circle icon="el-icon-camera" type="primary"></el-button>
+    </div>
+    
+    
   </div>
 </template>
 <script>
+import axios from "axios";
 export default {
   data() {
     return {
       videoWidth: 3000,
-      videoHeight: 300,
+      videoHeight: 3000,
       imgSrc: "",
       thisCancas: null,
       thisContext: null,
       thisVideo: null,
       backgroundImg: "",
+      bgName: "",
+      confirmPhoto: false,
+      file: "",
     };
   },
+  created() {
+    this.bgName = this.$route.query.name;
+  },
+  mounted() {
+    this.init();
+  },
   methods: {
+    init() {
+      this.getCompetence();
+    },
     // 调用权限（打开摄像头功能）
     getCompetence() {
-      this.backgroundImg = require('../assets/dzq_1.png');
+      this.confirmPhoto = false;
+      this.backgroundImg = require('../assets/' + this.bgName);
       document.getElementsByClassName("dzq_bg")[0].style.display = "inline";
       // console.log(document.getElementsByClassName("dzq_bg")[0].style.display);
 
+      this.imgSrc = "";
+      
       var _this = this;
       this.thisCancas = document.getElementById("canvasCamera");
       this.thisContext = this.thisCancas.getContext("2d");
@@ -118,6 +143,7 @@ export default {
     //  绘制图片（拍照功能）
 
     setImage() {
+      this.confirmPhoto = true;
       var _this = this;
       // 点击，canvas画图
       _this.thisContext.drawImage(
@@ -130,6 +156,7 @@ export default {
       // 获取图片base64链接
       var image = this.thisCancas.toDataURL("image/png");
       _this.imgSrc = image;
+      this.dataURLtoFile(_this.imgSrc, "test")
       this.$emit("refreshDataList", this.imgSrc);
     },
     // base64转文件
@@ -143,12 +170,31 @@ export default {
       while (n--) {
         u8arr[n] = bstr.charCodeAt(n);
       }
-      return new File([u8arr], filename, { type: mime });
+      this.file = new File([u8arr], filename, { type: mime });
+      console.log(this.file);
     },
     // 关闭摄像头
 
     stopNavigator() {
       this.thisVideo.srcObject.getTracks()[0].stop();
+    },
+
+    // 上传图片
+    uploadFile() {
+      let formData = new FormData();
+      formData.append("file", this.file);
+      axios
+        .post("https://www.performercn.com/api/qr-code/code-logo", formData, {
+          "Content-Type": "multipart/form-data",
+        })
+        .then((res) => {
+          window.URL.createObjectURL(res)
+          console.log(window.URL.createObjectURL(res));
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
   },
 };
@@ -212,5 +258,8 @@ export default {
     //   }
     // }
   }
+}
+.confirm {
+  text-align: center;
 }
 </style>

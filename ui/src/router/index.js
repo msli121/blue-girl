@@ -11,11 +11,14 @@ const routes = [
     component: Home,
   },
   {
+    path: "/selectCard",
+    name: "selectCard",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/selectCard.vue"),
+  },
+  {
     path: "/photo",
     name: "photo",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/photo.vue"),
   },

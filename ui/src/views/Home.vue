@@ -13,7 +13,7 @@ export default {
   },
   methods: {
     photo() {
-      this.$router.push({ path:'/photo'});
+      this.$router.push({ path:'/selectCard'});
     }
   }
 };
