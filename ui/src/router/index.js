@@ -1,14 +1,48 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Home from "../views/Home.vue";
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
-    name: "Home",
-    component: Home,
+    redirect: "/step1",
+  },
+  {
+    path: "/step1",
+    name: "step1",
+    component: () =>
+        import("../components/step1.vue"),
+  },
+  {
+    path: "/step2",
+    name: "step2",
+    component: () =>
+        import("../components/step2.vue"),
+  },
+  {
+    path: "/step3",
+    name: "step3",
+    component: () =>
+        import("../components/step3.vue"),
+  },
+  {
+    path: "/step4",
+    name: "step4",
+    component: () =>
+        import("../components/step4.vue"),
+  },
+  {
+    path: "/step5",
+    name: "step5",
+    component: () =>
+        import("../components/step5.vue"),
+  },
+  {
+    path: "/step6",
+    name: "step6",
+    component: () =>
+        import("../components/step6.vue"),
   },
   {
     path: "/selectCard",

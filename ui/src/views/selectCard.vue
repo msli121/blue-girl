@@ -26,7 +26,7 @@ export default {
     this.cardList = [
       {
         id: 1,
-        name: "dzq_1.png",
+        name: "deng.jpg",
         value: require("../assets/dzq_1.png")
       },
       {
