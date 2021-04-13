@@ -159,7 +159,7 @@ public class Base64Util {
             bos.flush();
         } catch (IOException e) {
             e.getMessage();
-        }finally{
+        }finally {
             try {
                 bis.close();
                 fos.close();

@@ -4,6 +4,7 @@ package com.blue.girl.server.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.blue.girl.server.config.CacheKeyManager;
+import com.blue.girl.server.dto.TagMergeRequest;
 import com.blue.girl.server.entity.FileRecordEntity;
 import com.blue.girl.server.exception.BusinessException;
 import com.blue.girl.server.service.BaseService;
@@ -19,12 +20,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartRequest;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Service("FileRecordServiceImpl")
@@ -135,7 +140,8 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
      * @param downloadUrl
      * @return
      */
-    public String getQrCodeUrl(String photoUrl, String downloadUrl) {
+    @Override
+    public FileRecordEntity getQrCodeUrl(String photoUrl, String downloadUrl) {
         try {
             // 获取静态 logo 图片
             ClassPathResource classPathResource = new ClassPathResource("static/logo.png");
@@ -153,42 +159,77 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
             fileRecord.setUploadTime(new Timestamp(System.currentTimeMillis()));
             // 保存文件记录
             fileRecordDao.save(fileRecord);
+            fileRecord.setFileUrl(downloadUrl + "/" + fileRecord.getId());
+            fileRecordDao.save(fileRecord);
             log.info("========== 二维码图片的本地地址 " + fileRecord.getLocalAddress());
             // 返回二维码图片 url
-            return downloadUrl + "/" + fileRecord.getId();
+            return fileRecordDao.save(fileRecord);
         } catch (Exception e) {
             e.getStackTrace();
             throw new BusinessException("-1", "生成二维码图片链接失败");
         }
     }
 
-    public String generateFileRootDir() {
-        String os = System.getProperty("os.name");
-        String fileRootDir;
-        if(os.toLowerCase().startsWith("win")) {
-            fileRootDir = "C:"+ File.separator + "blue-girl" + File.separator + "upload-picture";
-        } else if(os.toLowerCase().contains("mac")) {
-            fileRootDir = "/Users/liulin/Documents/blue-girl";
-        } else {
-            fileRootDir = "/opt/blue-girl/upload-picture";
+    /**
+     * 根据给定的图片 id 与 tag 融合
+     * @param request
+     * @param downloadUrl
+     * @return
+     */
+    @Override
+    public FileRecordEntity getMergedPhotoWithTags(TagMergeRequest request, String downloadUrl) {
+        FileRecordEntity mainPhoto = fileRecordDao.findById(request.getFileId());
+        if(null == mainPhoto || StringUtils.isEmpty(mainPhoto.getLocalAddress())) {
+            throw new BusinessException("-1", "图片不存在");
         }
-        return fileRootDir;
+        // 主要文件
+        File mainFile = new File(mainPhoto.getLocalAddress());
+        try {
+            // 主要图片
+            Image mainImage = ImageIO.read(mainFile);
+            //获取人物照片宽高
+            int width = mainImage.getWidth(null);
+            int height = mainImage.getHeight(null);
+            //创建一个画布，设置宽高（这里人物照片宽高就是画布宽高）
+            BufferedImage thumbImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            Graphics2D canvas = thumbImage.createGraphics();
+            request.getTagItems().forEach(tagItem -> {
+                try {
+                    File tagFile = (File) baseCache.getTenHoursCache().get(tagItem.getTagKey(), () -> {
+                        String tagFilePath = "static/" + tagItem.getTagKey();
+                        // 获取静态 tag 图片 file
+                        return new ClassPathResource(tagFilePath).getFile();
+                    });
+                    Image tagImage = ImageIO.read(tagFile);
+                    // 绘制 tag 图
+                    canvas.drawImage(tagImage.getScaledInstance(width,height, Image.SCALE_SMOOTH), 0, 0, null);
+                } catch (ExecutionException | IOException e) {
+                    e.printStackTrace();
+                    throw new BusinessException("-1", "获取 贴纸失败");
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new BusinessException("-1", "读取文件异常");
+        }
+        return null;
     }
 
     /**
      * 调用模型合并图片接口，结果持久化到本地文件
      * @param multipartFile
-     * @param backgroundPhoto
+     * @param bgKey
      * @param apiUrl
      * @return 可访问的网站文件链接
      */
-    public String getMergedPhotoUrl(MultipartFile multipartFile, String backgroundPhoto, String apiUrl, String downloadUrl){
-        if(StringUtils.isEmpty(backgroundPhoto) || multipartFile.isEmpty()) {
+    @Override
+    public FileRecordEntity getMergedPhotoUrl(MultipartFile multipartFile, String bgKey, String apiUrl, String downloadUrl){
+        if(StringUtils.isEmpty(bgKey) || multipartFile.isEmpty()) {
             throw new BusinessException("-1", "参数错误，背景图或原图为空");
         }
         try {
-            String backgroundBase64 = (String) baseCache.getTenHoursCache().get(backgroundPhoto, () -> {
-                String localPhotoUrl = "static/" + backgroundPhoto;
+            String backgroundBase64 = (String) baseCache.getTenHoursCache().get(bgKey, () -> {
+                String localPhotoUrl = "static/" + bgKey;
                 // 获取静态 logo 图片
                 ClassPathResource classPathResource = new ClassPathResource(localPhotoUrl);
                 // Base64 编码
@@ -212,11 +253,28 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
             String mergeResult = getMergeResult(photoBase64, backgroundBase64, apiUrl);
             log.info("========== 图片融合接口完毕 用时：" + (System.currentTimeMillis() - startTime) + "ms");
             // 获取可访问的文件 url
+            if(null == mergeResult || mergeResult.contains("error")) {
+                throw new BusinessException("-1", "模块返回出错");
+            }
             return saveBase64FileToLocalServer(mergeResult, downloadUrl);
         } catch (Exception e) {
             e.printStackTrace();
             throw new BusinessException("-1", e.getMessage());
         }
+    }
+
+
+    private String generateFileRootDir() {
+        String os = System.getProperty("os.name");
+        String fileRootDir;
+        if(os.toLowerCase().startsWith("win")) {
+            fileRootDir = "C:"+ File.separator + "blue-girl" + File.separator + "upload-picture";
+        } else if(os.toLowerCase().contains("mac")) {
+            fileRootDir = "/Users/liulin/Documents/blue-girl";
+        } else {
+            fileRootDir = "/opt/blue-girl/upload-picture";
+        }
+        return fileRootDir;
     }
 
     private String getMergeResult(String photoBase64, String backgroundBase64, String apiUrl) {
@@ -234,7 +292,7 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
         }
     }
 
-    private String saveBase64FileToLocalServer(String base64Str, String downloadUrl) {
+    private FileRecordEntity saveBase64FileToLocalServer(String base64Str, String downloadUrl) {
         // 判断传参
         if(StringUtils.isEmpty(base64Str)) {
             throw new BusinessException("-1", "模型接口返回为空");
@@ -251,7 +309,9 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
             fileRecord.setUploadTime(new Timestamp(System.currentTimeMillis()));
             // 保存所有文件记录
             fileRecordDao.save(fileRecord);
-            return downloadUrl + "/" + fileRecord.getId();
+            fileRecord.setFileUrl(downloadUrl + "/" + fileRecord.getId());
+            fileRecordDao.save(fileRecord);
+            return fileRecord;
         } catch (IOException e) {
             e.printStackTrace();
             throw new BusinessException("-1", "文件保存到本地失败");

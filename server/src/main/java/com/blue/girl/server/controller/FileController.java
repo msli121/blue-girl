@@ -2,7 +2,10 @@ package com.blue.girl.server.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.blue.girl.server.dto.ApiResult;
+import com.blue.girl.server.dto.TagMergeRequest;
+import com.blue.girl.server.entity.FileRecordEntity;
 import com.blue.girl.server.exception.BusinessException;
+import com.blue.girl.server.service.FileRecordService;
 import com.blue.girl.server.service.impl.FileRecordServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +31,7 @@ public class FileController {
     protected String apiUrl;
 
     @Autowired
-    FileRecordServiceImpl fileRecordService;
+    FileRecordService fileRecordService;
 
     /**
      * 下载服务器本地的文件
@@ -49,21 +52,36 @@ public class FileController {
     /**
      * 上传拍照图片，返回融图的 url
      * @param file
-     * @param backgroundPhoto
+     * @param bgKey
      * @return 融合后图片 url 和二维码 url
      */
     @PostMapping("/photo")
-    public ApiResult uploadPhotoToGetMergePhoto(@RequestParam("file") MultipartFile file, @RequestParam("bk") String backgroundPhoto) {
+    public ApiResult uploadPhotoToGetMergePhoto(@RequestParam("file") MultipartFile file, @RequestParam("other") String bgKey) {
         log.info(">>>>>>>>>>>>>> 进入图片融合接口");
         long startTime = System.currentTimeMillis();
-        String photoUrl = fileRecordService.getMergedPhotoUrl(file, backgroundPhoto, apiUrl, downloadUrl);
-        String qrCodeUrl = fileRecordService.getQrCodeUrl(photoUrl, downloadUrl);
+        FileRecordEntity photo = fileRecordService.getMergedPhotoUrl(file, bgKey, apiUrl, downloadUrl);
+        FileRecordEntity qrCode = fileRecordService.getQrCodeUrl(photo.getFileUrl(), downloadUrl);
         // 保存结果进行返回
-        HashMap<String, String> resultMap = new HashMap<>();
-        resultMap.put("photoUrl", photoUrl);
-        resultMap.put("qrCodeUrl", qrCodeUrl);
+        HashMap<String, Object> resultMap = new HashMap<>();
+        resultMap.put("mergedPhoto", photo);
+        resultMap.put("qrCode", qrCode);
         log.info("<<<<<<<<<<<<<<< 退出图片融合接口 用时：" + (System.currentTimeMillis()-startTime) + "ms");
         return ApiResult.T(resultMap);
+    }
+
+
+    /**
+     * 上传贴纸进行融合
+     * @param request
+     * @return
+     */
+    @PostMapping("/tag")
+    public ApiResult mergeTags(@RequestBody TagMergeRequest request) {
+        log.info(">>>>>>>>>>>>>> 进入上传贴纸进行融合接口");
+        long startTime = System.currentTimeMillis();
+
+        log.info("<<<<<<<<<<<<<<< 退出图片融合接口 用时：" + (System.currentTimeMillis()-startTime) + "ms");
+        return ApiResult.T();
     }
 
 //    /**
