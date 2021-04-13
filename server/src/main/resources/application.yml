@@ -24,3 +24,6 @@ spring:
     url: jdbc:mysql://47.117.127.63:3306/blue_girl?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: blue_girl
     password: Blue@123456
+
+api:
+  url: http://101.132.24.161:80/detect

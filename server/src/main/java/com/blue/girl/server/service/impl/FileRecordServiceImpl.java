@@ -8,10 +8,8 @@ import com.blue.girl.server.entity.FileRecordEntity;
 import com.blue.girl.server.exception.BusinessException;
 import com.blue.girl.server.service.BaseService;
 import com.blue.girl.server.service.FileRecordService;
-import com.blue.girl.server.utils.Base64Util;
-import com.blue.girl.server.utils.BaseCache;
-import com.blue.girl.server.utils.SysHttpUtils;
-import com.blue.girl.server.utils.SysRandomUtil;
+import com.blue.girl.server.utils.*;
+import com.google.zxing.qrcode.encoder.QRCode;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,15 +99,7 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
      */
     @Override
     public String uploadFileToLocalServer(MultipartFile multipartFile, String downloadUrl) {
-        String os = System.getProperty("os.name");
-        String fileRootDir;
-        if(os.toLowerCase().startsWith("win")) {
-            fileRootDir = "C:"+ File.separator + "blue-girl" + File.separator + "upload-picture";
-        } else if(os.toLowerCase().contains("mac")) {
-            fileRootDir = "/Users/liulin/Documents/blue-girl";
-        } else {
-            fileRootDir = "/opt/blue-girl/upload-picture";
-        }
+        String fileRootDir = generateFileRootDir();
         // 校验文件夹是否存在
         File folder = new File(fileRootDir);
         if (!folder.isDirectory()) {
@@ -139,8 +129,60 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
         }
     }
 
+    /**
+     * 获取二维码图片 url
+     * @param photoUrl
+     * @param downloadUrl
+     * @return
+     */
+    public String getQrCodeUrl(String photoUrl, String downloadUrl) {
+        try {
+            // 获取静态 logo 图片
+            ClassPathResource classPathResource = new ClassPathResource("static/logo.png");
+            // 静态 logo 图片输入流
+            InputStream logoInputStream = classPathResource.getInputStream();
+            // 生成二维码图片文件对应的 url
+            String fileName = SysRandomUtil.getRandomString(16) + ".png";
+            String fileRootDir = generateFileRootDir();
+            File newFile = new File(fileRootDir, fileName);
+            QRCodeUtil.encode(photoUrl, logoInputStream, newFile);
+            // 记录本次文件操作
+            FileRecordEntity fileRecord = new FileRecordEntity();
+            fileRecord.setFileName(fileName);
+            fileRecord.setLocalAddress(fileRootDir + File.separator + fileName);
+            fileRecord.setUploadTime(new Timestamp(System.currentTimeMillis()));
+            // 保存文件记录
+            fileRecordDao.save(fileRecord);
+            log.info("========== 二维码图片的本地地址 " + fileRecord.getLocalAddress());
+            // 返回二维码图片 url
+            return downloadUrl + "/" + fileRecord.getId();
+        } catch (Exception e) {
+            e.getStackTrace();
+            throw new BusinessException("-1", "生成二维码图片链接失败");
+        }
+    }
 
-    public String getMergedPhotoUrl(MultipartFile multipartFile, String backgroundPhoto, String apiUrl){
+    public String generateFileRootDir() {
+        String os = System.getProperty("os.name");
+        String fileRootDir;
+        if(os.toLowerCase().startsWith("win")) {
+            fileRootDir = "C:"+ File.separator + "blue-girl" + File.separator + "upload-picture";
+        } else if(os.toLowerCase().contains("mac")) {
+            fileRootDir = "/Users/liulin/Documents/blue-girl";
+        } else {
+            fileRootDir = "/opt/blue-girl/upload-picture";
+        }
+        return fileRootDir;
+    }
+
+    /**
+     * 调用模型合并图片接口，结果持久化到本地文件
+     * @param multipartFile
+     * @param backgroundPhoto
+     * @param apiUrl
+     * @return 可访问的网站文件链接
+     */
+    public String getMergedPhotoUrl(MultipartFile multipartFile, String backgroundPhoto, String apiUrl, String downloadUrl){
         if(StringUtils.isEmpty(backgroundPhoto) || multipartFile.isEmpty()) {
             throw new BusinessException("-1", "参数错误，背景图或原图为空");
         }
@@ -149,58 +191,67 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
                 String localPhotoUrl = "static/" + backgroundPhoto;
                 // 获取静态 logo 图片
                 ClassPathResource classPathResource = new ClassPathResource(localPhotoUrl);
-                // Base64编码
+                // Base64 编码
                 InputStream inputStream =classPathResource.getInputStream();
-                String baes64Str = Base64Util.inputStreamToBase64Str(inputStream);
+                String base64Str = Base64Util.inputStreamToBase64Str(inputStream);
                 // 删除 \r\n
-                baes64Str = baes64Str.replaceAll("[\\s*\t\n\r]", "");
+                base64Str = base64Str.replaceAll("[\\s*\t\n\r]", "");
                 // 删除 前缀
-                baes64Str =  baes64Str.contains(",") ? baes64Str.split(",")[1] : baes64Str;
-                return baes64Str;
+                base64Str =  base64Str.contains(",") ? base64Str.split(",")[1] : base64Str;
+                return base64Str;
             });
-            // Base64编码
+            // Base64 编码
             String photoBase64 = Base64Util.inputStreamToBase64Str(multipartFile.getInputStream());
             // 删除 \r\n
             photoBase64 = photoBase64.replaceAll("[\\s*\t\n\r]", "");
-            // 删除 前缀
+            // 删除前缀
             photoBase64 = photoBase64.contains(",") ? photoBase64.split(",")[1] : photoBase64;
-            // 构造请求体
-            ArrayList<String> requestData = new ArrayList<>();
-            requestData.add(photoBase64);
-            requestData.add(backgroundBase64);
-            // 发送请求
-            String mergeResult;
-            try {
-                mergeResult = SysHttpUtils.getInstance().sendJsonPost(apiUrl, JSON.toJSONString(requestData));
-            } catch (Exception e) {
-                throw new BusinessException("-1", "连接模型服务器失败，请稍后再试");
-            }
-            return saveBase64FileToLocalServer(mergeResult);
+            // 获取模型合并结果
+            log.info("========== 开始调用图片融合接口");
+            long startTime = System.currentTimeMillis();
+            String mergeResult = getMergeResult(photoBase64, backgroundBase64, apiUrl);
+            log.info("========== 图片融合接口完毕 用时：" + (System.currentTimeMillis() - startTime) + "ms");
+            // 获取可访问的文件 url
+            return saveBase64FileToLocalServer(mergeResult, downloadUrl);
         } catch (Exception e) {
             e.printStackTrace();
             throw new BusinessException("-1", e.getMessage());
         }
     }
 
-    private String saveBase64FileToLocalServer(String base64Str) {
+    private String getMergeResult(String photoBase64, String backgroundBase64, String apiUrl) {
+        // 构造请求体
+        ArrayList<String> requestData = new ArrayList<>();
+        requestData.add(photoBase64);
+        requestData.add(backgroundBase64);
+        // 发送请求
+        String mergeResult;
+        try {
+            mergeResult = SysHttpUtils.getInstance().sendJsonPost(apiUrl, JSON.toJSONString(requestData));
+            return mergeResult;
+        } catch (Exception e) {
+            throw new BusinessException("-1", "连接模型服务器失败，请稍后再试");
+        }
+    }
+
+    private String saveBase64FileToLocalServer(String base64Str, String downloadUrl) {
         // 判断传参
         if(StringUtils.isEmpty(base64Str)) {
             throw new BusinessException("-1", "模型接口返回为空");
         }
-        // 判断操作系统
-        String os = System.getProperty("os.name");
-        String fileRootDir;
-        if(os.toLowerCase().startsWith("win")) {
-            fileRootDir = "C:"+ File.separator + "blue-girl" + File.separator + "upload-picture" +  File.separator;
-        } else if(os.toLowerCase().contains("mac")) {
-            fileRootDir = "/Users/liulin/Documents/blue-girl/";
-        } else {
-            fileRootDir = "/opt/blue-girl/upload-picture/";
-        }
+        // 生成本地文件
+        String fileRootDir = generateFileRootDir() + File.separator;
         String fileName = SysRandomUtil.getRandomString(16) + ".jpg";
         // 保存到本地
         try {
             Base64Util.base64ContentToFile(base64Str, fileRootDir + fileName);
+            FileRecordEntity fileRecord = new FileRecordEntity();
+            fileRecord.setFileName(fileName);
+            fileRecord.setLocalAddress(fileRootDir + fileName);
+            fileRecord.setUploadTime(new Timestamp(System.currentTimeMillis()));
+            // 保存所有文件记录
+            fileRecordDao.save(fileRecord);
+            return downloadUrl + "/" + fileRecord.getId();
         } catch (IOException e) {
             e.printStackTrace();
             throw new BusinessException("-1", "文件保存到本地失败");

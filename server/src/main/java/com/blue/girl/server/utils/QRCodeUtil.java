@@ -211,6 +211,12 @@ public class QRCodeUtil {
         ImageIO.write(image, FORMAT_NAME, output);
     }
 
+    public static void encode(String content, InputStream inputStream, File file)
+            throws Exception {
+        BufferedImage image = QRCodeUtil.createImage(content, inputStream, true);
+        ImageIO.write(image, FORMAT_NAME, file);
+    }
+
 
     public static void encode(String content, OutputStream output) throws Exception {
         QRCodeUtil.encode(content, "", output, false);
