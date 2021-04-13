@@ -1,96 +1,251 @@
 <template>
-  <div class="step-4-bg">
-    <el-image @click="handleStepClick"
-              style="width: 100%; height: 100%"
-              :src="url"
-              :fit="bgFit">
-    </el-image>
-    <div style="z-index: 999;position: absolute;top: 40%">
-      <el-image v-for="item in existUrlList" :key="item.tempID"
-                style="width: 100px;height: 100px;padding: 5px"
-                :src="item.url"
-                :fit="imageFit"
-      ></el-image>
-    </div>
-    <div style="z-index:999;background-color: cornflowerblue;position: absolute;bottom: 0;width: 100%;opacity: .85">
-      <div style="width: 100%;" class="title">
-        <h2>贴    纸</h2>
+  <div>
+    <div class="camera_outer">
+      <video
+        id="videoCamera"
+        :width="videoWidth"
+        :height="videoHeight"
+        autoplay
+      ></video>
+      <canvas
+        style="display: none"
+        id="canvasCamera"
+        :width="videoWidth"
+        :height="videoHeight"
+      ></canvas>
+
+      <div v-if="imgSrc" class="img_bg_camera">
+        <img :src="imgSrc" alt="" class="tx_img" />
       </div>
-      <el-image v-for="item in stickUrlList" :key="item.tempID"
-                @click="handleStickerClick(item)"
-                style="width: 100px;height: 100px;padding: 5px;opacity: 1"
-                :src="item.url"
-                :fit="imageFit"
-      ></el-image>
+    </div>
+    <div class="dzq_bg" style="width:100%; height:90%; display: none; position: fixed; top: 0; left: 0; bottom: 0; right: 0;">
+      <img style="float: right; width:100%; height:100%;" :src="backgroundImg" class="dzq_img" />
+    </div>
+    <div class="confirm" v-if="confirmPhoto">
+      <!-- 重拍 -->
+      <el-button
+        style="font-size: 40px"
+        @click="getCompetence()"
+        circle
+        icon="el-icon-camera"
+        type="danger"
+      ></el-button>
+      <!-- 保存 -->
+      <el-button
+        style="font-size: 40px; margin-left: 30px"
+        @click="uploadFile()"
+        circle
+        icon="el-icon-download"
+        type="success"
+      ></el-button>
+    </div>
+    <div class="confirm" v-else>
+      <!-- 拍照 -->
+      <el-button
+        style="font-size: 40px"
+        @click="setImage()"
+        circle
+        icon="el-icon-camera"
+        type="primary"
+      ></el-button>
     </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
 export default {
   name: "step4",
   data() {
     return {
-      url: require("../assets/bg10.png"),
-      bgFit:'fill',
-      imageFit: "contain",
-      stickUrlList:[
-        {
-          urlString:'../assets/sticker1.png',
-          url:require("../assets/sticker1.png"),
-          tempID:Math.random()
-        },
-        {
-          urlString:'../assets/sticker2.png',
-          url:require("../assets/sticker2.png"),
-          tempID:Math.random()
-        },
-        {
-          urlString:'../assets/sticker3.png',
-          url:require("../assets/sticker3.png"),
-          tempID:Math.random()
-        },
-        {
-          urlString:'../assets/sticker4.png',
-          url:require("../assets/sticker4.png"),
-          tempID:Math.random()
-        },
-        // {
-        //   url:require("../assets/sticker5.png"),
-        //   tempID:Math.random()
-        // },
-        // {
-        //   url:require("../assets/sticker6.png"),
-        //   tempID:Math.random()
-        // },
-      ],
-      existUrlList:[],
-  };
+      videoWidth: 455,
+      videoHeight: 1000,
+      imgSrc: "",
+      thisCancas: null,
+      thisContext: null,
+      thisVideo: null,
+      backgroundImg: "",
+      bgName: "",
+      confirmPhoto: false,
+      file: "",
+    };
+  },
+  created() {
+    this.bgName = this.$route.query.name;
+  },
+  mounted() {
+    this.init();
   },
   methods: {
-    handleStepClick() {
-      this.$router.replace({path: "/step6"})
+    init() {
+      this.getCompetence();
     },
-    handleStickerClick(val) {
-      let item = val
-      item.tempID = Math.random()
-      this.existUrlList.push(item)
-      console.log(this.existUrlList)
+    // 调用权限（打开摄像头功能）
+    getCompetence() {
+      this.confirmPhoto = false;
+      this.backgroundImg = require("../assets/" + this.bgName);
+      document.getElementsByClassName("dzq_bg")[0].style.display = "inline";
+      // console.log(document.getElementsByClassName("dzq_bg")[0].style.display);
+
+      this.imgSrc = "";
+
+      var _this = this;
+      this.thisCancas = document.getElementById("canvasCamera");
+      this.thisContext = this.thisCancas.getContext("2d");
+      this.thisVideo = document.getElementById("videoCamera");
+      // 旧版本浏览器可能根本不支持mediaDevices，我们首先设置一个空对象
+      if (navigator.mediaDevices === undefined) {
+        navigator.mediaDevices = {};
+      }
+      // 一些浏览器实现了部分mediaDevices，我们不能只分配一个对象
+      // 使用getUserMedia，因为它会覆盖现有的属性。
+      // 这里，如果缺少getUserMedia属性，就添加它。
+      if (navigator.mediaDevices.getUserMedia === undefined) {
+        navigator.mediaDevices.getUserMedia = function (constraints) {
+          // 首先获取现存的getUserMedia(如果存在)
+          var getUserMedia =
+            navigator.webkitGetUserMedia ||
+            navigator.mozGetUserMedia ||
+            navigator.getUserMedia;
+          // 有些浏览器不支持，会返回错误信息
+          // 保持接口一致
+          if (!getUserMedia) {
+            return Promise.reject(
+              new Error("getUserMedia is not implemented in this browser")
+            );
+          }
+          // 否则，使用Promise将调用包装到旧的navigator.getUserMedia
+          return new Promise(function (resolve, reject) {
+            getUserMedia.call(navigator, constraints, resolve, reject);
+          });
+        };
+      }
+      var constraints = {
+        audio: false,
+        video: {
+          width: this.videoWidth,
+          height: this.videoHeight,
+          transform: "scaleX(-1)",
+        },
+      };
+      navigator.mediaDevices
+        .getUserMedia(constraints)
+        .then(function (stream) {
+          // 旧的浏览器可能没有srcObject
+          if ("srcObject" in _this.thisVideo) {
+            _this.thisVideo.srcObject = stream;
+          } else {
+            // 避免在新的浏览器中使用它，因为它正在被弃用。
+            _this.thisVideo.src = window.URL.createObjectURL(stream);
+          }
+          _this.thisVideo.onloadedmetadata = function (e) {
+            console.log(e);
+            _this.thisVideo.play();
+          };
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    //  绘制图片（拍照功能）
+
+    setImage() {
+      this.confirmPhoto = true;
+      var _this = this;
+      // 点击，canvas画图
+      _this.thisContext.drawImage(
+        _this.thisVideo,
+        0,
+        0,
+        _this.videoWidth,
+        _this.videoHeight
+      );
+      // 获取图片base64链接
+      var image = this.thisCancas.toDataURL("image/png");
+      _this.imgSrc = image;
+      this.dataURLtoFile(_this.imgSrc, "groupPhoto.png");
+      this.$emit("refreshDataList", this.imgSrc);
+    },
+    // base64转文件
+
+    dataURLtoFile(dataurl, filename) {
+      var arr = dataurl.split(",");
+      var mime = arr[0].match(/:(.*?);/)[1];
+      var bstr = atob(arr[1]);
+      var n = bstr.length;
+      var u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      this.file = new File([u8arr], filename, { type: mime });
+      console.log(this.file);
+    },
+    // 关闭摄像头
+
+    stopNavigator() {
+      this.thisVideo.srcObject.getTracks()[0].stop();
+    },
+
+    // 上传图片
+    uploadFile() {
+      let formData = new FormData();
+      console.log(this.file);
+      formData.append("file", this.file);
+      formData.append("other", this.bgName)
+      console.log(formData);
+      axios
+        .post("https://www.performercn.com/api/file/photo", formData, {
+          "Content-Type": "multipart/form-data",
+        })
+        .then((res) => {
+          if (res.data.flag === "T") {
+            this.$router.push({
+              path: "/step5",
+              query: { src: res.data.mergedPhoto.fileUrl },
+            });
+          } else {
+            this.$notify.error({
+              title: "错误",
+              message: `出错啦！重新尝试`,
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+  },
+};
+</script>
+
+<style lang="less">
+.camera_outer {
+  position: relative;
+  overflow: hidden;
+  background-size: 100%;
+  video,
+  canvas,
+  .tx_img {
+    width: 100%;
+    height: 100%;
+    // -moz-transform: scaleX(-1);
+    // -webkit-transform: scaleX(-1);
+    // -o-transform: scaleX(-1);
+    // transform: scaleX(-1);
+  }
+  .img_bg_camera {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    img {
+      width: 490px;
+      height: 1000px;
     }
   }
 }
-</script>
-
-<style scoped lang="less">
-.step-4-bg {
-  position: relative;
-}
-.title {
+.confirm {
   text-align: center;
-  color: yellow;
-
-  h2 {
-    margin-top: 10px;
-  }
 }
 </style>

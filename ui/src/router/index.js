@@ -45,25 +45,7 @@ const routes = [
     path: "/step6",
     name: "step6",
     component: step6,
-  },
-  {
-    path: "/selectCard",
-    name: "selectCard",
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/selectCard.vue"),
-  },
-  {
-    path: "/photo",
-    name: "photo",
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/photo.vue"),
-  },
-  {
-    path: "/download",
-    name: "download",
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/download.vue"),
-  },
+  }
 ];
 
 const router = new VueRouter({
