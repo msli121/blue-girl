@@ -1,48 +1,50 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
+import step1 from "../components/step1";
+import step2 from "../components/step2";
+import step3 from "../components/step3";
+import step4 from "../components/step4";
+import step5 from "../components/step5";
+import step6 from "../components/step6";
+import loading from "../components/loading";
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
-    redirect: "/step1",
+    name: "loading",
+    component: loading,
   },
   {
     path: "/step1",
     name: "step1",
-    component: () =>
-        import("../components/step1.vue"),
+    component: step1,
   },
   {
     path: "/step2",
     name: "step2",
-    component: () =>
-        import("../components/step2.vue"),
+    component: step2,
   },
   {
     path: "/step3",
     name: "step3",
-    component: () =>
-        import("../components/step3.vue"),
+    component: step3,
   },
   {
     path: "/step4",
     name: "step4",
-    component: () =>
-        import("../components/step4.vue"),
+    component: step4,
   },
   {
     path: "/step5",
     name: "step5",
-    component: () =>
-        import("../components/step5.vue"),
+    component: step5,
   },
   {
     path: "/step6",
     name: "step6",
-    component: () =>
-        import("../components/step6.vue"),
+    component: step6,
   },
   {
     path: "/selectCard",
