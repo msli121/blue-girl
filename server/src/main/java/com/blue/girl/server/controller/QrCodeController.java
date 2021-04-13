@@ -44,8 +44,8 @@ public class QrCodeController {
             String code = fileRecordService.uploadFileToLocalServer(file, downloadUrl);
             // 获取静态 logo 图片
             ClassPathResource classPathResource = new ClassPathResource("static/logo.png");
-            // 使用工具类生成二维码
             InputStream inputStream =classPathResource.getInputStream();
+            // 使用工具类生成二维码
             QRCodeUtil.encode(code, inputStream, outputStream, true);
         } catch (Exception e) {
             e.getStackTrace();

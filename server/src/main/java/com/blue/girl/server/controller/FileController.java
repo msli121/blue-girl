@@ -38,6 +38,10 @@ public class FileController {
     }
 
 
+    @PostMapping("/photo")
+    public void uploadPhotoToGetMergePhoto(@RequestParam("file") MultipartFile file, @RequestParam("bk") String backgroundPhoto) {
+
+    }
 
 //    /**
 //     * 上传文件到服务器，保存在服务器本地

@@ -35,6 +35,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!--guava依赖包-->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
+        </dependency>
         <!-- log4j2 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
