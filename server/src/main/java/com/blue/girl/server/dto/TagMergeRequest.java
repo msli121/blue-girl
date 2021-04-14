@@ -7,5 +7,5 @@ import java.util.List;
 @Data
 public class TagMergeRequest {
     private int fileId;
-    private List<TagItem> tagItems;
+    private List<TagItem> tags;
 }

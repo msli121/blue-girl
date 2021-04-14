@@ -2,15 +2,12 @@ package com.blue.girl.server.service.impl;
 
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.blue.girl.server.config.CacheKeyManager;
 import com.blue.girl.server.dto.TagMergeRequest;
 import com.blue.girl.server.entity.FileRecordEntity;
 import com.blue.girl.server.exception.BusinessException;
 import com.blue.girl.server.service.BaseService;
 import com.blue.girl.server.service.FileRecordService;
 import com.blue.girl.server.utils.*;
-import com.google.zxing.qrcode.encoder.QRCode;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +15,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartRequest;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
@@ -27,9 +23,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Service("FileRecordServiceImpl")
@@ -61,7 +55,7 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
     }
 
     @Override
-    public void downloadLocalServerFile(int fileId, HttpServletResponse response) throws IOException {
+    public void downloadLocalServerFile(int fileId, HttpServletResponse response) {
         FileRecordEntity fileRecord = fileRecordDao.findById(fileId);
         if(null != fileRecord) {
             response.setDateHeader("Expires", 0L);
@@ -187,25 +181,22 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
         try {
             // 主要图片
             BufferedImage mainImage = ImageIO.read(mainFile);
-            // 获取人物照片宽高
-//            int width = mainImage.getWidth(null);
-//            int height = mainImage.getHeight(null);
-            // 创建一个画布，设置宽高（这里人物照片宽高就是画布宽高）
-//            BufferedImage mainBufferImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            // 生成画布
             Graphics2D canvas = mainImage.createGraphics();
-            request.getTagItems().forEach(tagItem -> {
+            request.getTags().forEach(tagItem -> {
                 try {
                     File tagFile = (File) baseCache.getTenHoursCache().get(tagItem.getTagKey(), () -> {
                         String tagFilePath = "static/" + tagItem.getTagKey();
-                        // 获取静态 tag 图片 file
-                        return new ClassPathResource(tagFilePath).getFile();
+                        // 获取静态 tag 图片
+                        ClassPathResource classPathResource = new ClassPathResource(tagFilePath);
+                        return classPathResource.getFile();
                     });
                     BufferedImage tagImage = ImageIO.read(tagFile);
                     // 绘制 tag 图到基本图
                     canvas.drawImage(tagImage, tagItem.getLeftStart(), tagItem.getTopStart(), null);
                 } catch (ExecutionException | IOException e) {
                     e.printStackTrace();
-                    throw new BusinessException("-1", "获取 贴纸失败");
+                    throw new BusinessException("-1", "获取贴纸失败");
                 }
             });
             // 释放图形上下文使用的系统资源
