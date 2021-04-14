@@ -11,6 +11,7 @@
 export default {
   name: "step6",
   data() {
+
     return {
       url: require("../assets/step-6-bg.jpg"),
       fit: "fill"
