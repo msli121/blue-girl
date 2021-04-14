@@ -186,13 +186,13 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
         File mainFile = new File(mainPhoto.getLocalAddress());
         try {
             // 主要图片
-            Image mainImage = ImageIO.read(mainFile);
+            BufferedImage mainImage = ImageIO.read(mainFile);
             // 获取人物照片宽高
-            int width = mainImage.getWidth(null);
-            int height = mainImage.getHeight(null);
+//            int width = mainImage.getWidth(null);
+//            int height = mainImage.getHeight(null);
             // 创建一个画布，设置宽高（这里人物照片宽高就是画布宽高）
-            BufferedImage mainBufferImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            Graphics2D canvas = mainBufferImage.createGraphics();
+//            BufferedImage mainBufferImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            Graphics2D canvas = mainImage.createGraphics();
             request.getTagItems().forEach(tagItem -> {
                 try {
                     File tagFile = (File) baseCache.getTenHoursCache().get(tagItem.getTagKey(), () -> {
@@ -211,11 +211,11 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
             // 释放图形上下文使用的系统资源
             canvas.dispose();
             // 输出图片到本地
+            return saveBufferImageToLocalServer(mainImage, downloadUrl);
         } catch (IOException e) {
             e.printStackTrace();
             throw new BusinessException("-1", "读取文件异常");
         }
-        return null;
     }
 
     /**
@@ -295,8 +295,26 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
         }
     }
 
-    private FileRecordEntity saveBufferImageToLocalServer(BufferedImage image) {
-        return null;
+    private FileRecordEntity saveBufferImageToLocalServer(BufferedImage image, String downloadUrl) {
+        // 生成本地文件
+        try {
+            String fileRootDir = generateFileRootDir() + File.separator;
+            String fileName = SysRandomUtil.getRandomString(16) + ".png";
+            File newFile = new File(fileRootDir + fileName);
+            ImageIO.write(image, "png", newFile);
+            FileRecordEntity fileRecord = new FileRecordEntity();
+            fileRecord.setFileName(fileName);
+            fileRecord.setLocalAddress(fileRootDir + fileName);
+            fileRecord.setUploadTime(new Timestamp(System.currentTimeMillis()));
+            // 保存所有文件记录
+            fileRecordDao.save(fileRecord);
+            fileRecord.setFileUrl(downloadUrl + "/" + fileRecord.getId());
+            fileRecordDao.save(fileRecord);
+            return fileRecord;
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new BusinessException("-1", "图片写入到本地失败");
+        }
     }
 
     private FileRecordEntity saveBase64FileToLocalServer(String base64Str, String downloadUrl) {

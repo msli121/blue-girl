@@ -77,11 +77,16 @@ public class FileController {
      */
     @PostMapping("/tag")
     public ApiResult mergeTags(@RequestBody TagMergeRequest request) {
-        log.info(">>>>>>>>>>>>>> 进入上传贴纸进行融合接口");
+        log.info(">>>>>>>>>>>>>> 进入贴纸融合接口");
         long startTime = System.currentTimeMillis();
-
-        log.info("<<<<<<<<<<<<<<< 退出图片融合接口 用时：" + (System.currentTimeMillis()-startTime) + "ms");
-        return ApiResult.T();
+        FileRecordEntity tagPhoto = fileRecordService.getMergedPhotoWithTags(request, downloadUrl);
+        FileRecordEntity qrCode = fileRecordService.getQrCodeUrl(tagPhoto.getFileUrl(), downloadUrl);
+        // 保存结果进行返回
+        HashMap<String, Object> resultMap = new HashMap<>();
+        resultMap.put("tagPhoto", tagPhoto);
+        resultMap.put("qrCode", qrCode);
+        log.info("<<<<<<<<<<<<<<< 退出贴纸融合接口 总用时：" + (System.currentTimeMillis()-startTime) + "ms");
+        return ApiResult.T(resultMap);
     }
 
 //    /**
