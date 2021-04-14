@@ -1,126 +1,201 @@
 <template>
-  <div class="step-5-bg">
-    <video id="videoCamera" :width="videoWidth" :height="videoHeight" autoplay></video>
-    <canvas style="display:none;" id="canvasCamera" :width="videoWidth" :height="videoHeight" ></canvas>
-
-    <div v-if="imgSrc" class="img_bg_camera">
-      <img :src="imgSrc" alt="" class="tx_img">
+  <div class="step-4-bg">
+    <el-image @click="handleStepClick"
+              style="width: 100%; height: 100%"
+              :src="url"
+              :fit="bgFit">
+    </el-image>
+    <div style="z-index: 999">
+      <!--      ;position: absolute;top: 40%-->
+      <draggable v-model="existUrlList" group="people" @start="drag=true" @end="doEnd">
+        <el-image v-for="item in existUrlList" :key="item.tempID"
+                  style="position:absolute;width: 100px;height: 100px;padding: 5px"
+                  :style="item.style"
+                  :src="item.url"
+                  :fit="imageFit"
+        ></el-image>
+      </draggable>
     </div>
-    <button @click="getCompetence">打开摄像头</button>
-    <button @click="stopNavigator">关闭摄像头</button>
-    <button @click="setImage">拍照</button>
+    <div style="z-index:999;background-color: #111721;position: absolute;bottom: 0;width: 100%;opacity: .85">
+      <div style="width: 100%;position: relative;" class="title">
+        <span class="reset" style="position: absolute;left: 20px;top: 15px;" @click="doReset">重置</span>
+        <h2>贴    纸</h2>
+        <span class="save" style="position: absolute;right: 20px;top: 15px;" @click="doSave">保存</span>
+      </div>
+<!--      <div>-->
+<!--        <el-button>保存</el-button>-->
+<!--      </div>-->
+      <el-image v-for="item in stickUrlList" :key="item.tempID"
+                @click="handleStickerClick(item)"
+                style="width: 100px;height: 100px;padding: 5px;opacity: 1"
+                :src="item.url"
+                :fit="imageFit"
+      ></el-image>
+    </div>
   </div>
 </template>
 
 <script>
+import draggable from 'vuedraggable'
+import {saveSticker} from "@/server/api";
+
 export default {
-  name: "step5",
+
+  name: "step6",
+
+  components:{
+    draggable
+  },
+
+  created() {
+    console.log(this.$route.query)
+    this.fileId = this.$route.query.mergedId
+    this.imgUrl = this.$route.query.mergedUrl
+    this.fileUrl = this.$route.query.qrCodeUrl
+  },
+
   data() {
     return {
-      videoWidth: 720,
-      videoHeight: 1280,
-      imgSrc: '',
-      thisCanvas: null,
-      thisContext: null,
-      thisVideo: null,
+      // url: require("../assets/step-6-bg.jpg"),
+      fileId:'',
+      imgUrl:'',
+      fileUrl:'',
+      fit: "fill",
+      url: require("../assets/bg10.png"),
+      bgFit:'fill',
+      imageFit: "contain",
+      stickUrlList:[
+        {
+          tagKey:'sticker1.png',
+          leftStart:100,
+          topStart:100,
+          urlString:'../assets/sticker1.png',
+          url:require("../assets/sticker1.png"),
+          tempID:Math.random(),
+          style:'top:100px;left:100px',
+        },
+        {
+          tagKey:'sticker2.png',
+          leftStart:0,
+          topStart:550,
+          urlString:'../assets/sticker2.png',
+          url:require("../assets/sticker2.png"),
+          tempID:Math.random(),
+          style:'position:absolute;bottom:200px;left:0',
+        },
+        {
+          tagKey:'sticker3.png',
+          leftStart:100,
+          topStart:335,
+          urlString:'../assets/sticker3.png',
+          url:require("../assets/sticker3.png"),
+          tempID:Math.random(),
+          style:'position:absolute;bottom:400px;right:0',
+        },
+        {
+          tagKey:'sticker4.png',
+          leftStart:0,
+          topStart:400,
+          urlString:'../assets/sticker4.png',
+          url:require("../assets/sticker4.png"),
+          tempID:Math.random(),
+          style:'position:absolute;bottom:300px;left:0',
+        },
+        // {
+        //   url:require("../assets/sticker5.png"),
+        //   tempID:Math.random()
+        // },
+        // {
+        //   url:require("../assets/sticker6.png"),
+        //   tempID:Math.random()
+        // },
+      ],
+      existUrlList:[],
     };
   },
   methods: {
-    // 打开摄像头功能
-    getCompetence() {
-      var _this = this
-      this.thisCancas = document.getElementById('canvasCamera')
-      this.thisContext = this.thisCancas.getContext('2d')
-      this.thisVideo = document.getElementById('videoCamera')
-
-      // 旧版本浏览器可能根本不支持mediaDevices，我们首先设置一个空对象
-      if (navigator.mediaDevices === undefined) {
-        navigator.mediaDevices = {}
-      }
-
-      // 使用getUserMedia，因为它会覆盖现有的属性。
-      // 这里，如果缺少getUserMedia属性，就添加它。
-      if (navigator.mediaDevices.getUserMedia === undefined) {
-        navigator.mediaDevices.getUserMedia = function (constraints) {
-          // 首先获取现存的getUserMedia(如果存在)
-          var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.getUserMedia
-          // 有些浏览器不支持，会返回错误信息
-          // 保持接口一致
-          if (!getUserMedia) {
-            return Promise.reject(new Error('getUserMedia is not implemented in this browser'))
-          }
-          // 否则，使用Promise将调用包装到旧的navigator.getUserMedia
-          return new Promise(function (resolve, reject) {
-            getUserMedia.call(navigator, constraints, resolve, reject)
-          })
+    handleStepClick() {
+      this.$router.replace({path: "/step1"})
+    },
+    handleStickerClick(val) {
+      let imgInfo = val
+      let deleteFlag = false
+      let delIndex = 0
+      this.existUrlList.forEach((item,index) => {
+        if (item.urlString === imgInfo.urlString) {
+          deleteFlag = true
+          delIndex = index
         }
-      }
-
-      // 摄像头大小配置
-      var constraints = {
-        audio: false,
-        video: {
-          width: this.videoWidth,
-          height: this.videoHeight,
-          transform: 'scaleX(-1)' }
-      }
-
-      navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
-        // 旧的浏览器可能没有srcObject
-        if ('srcObject' in _this.thisVideo) {
-          _this.thisVideo.srcObject = stream
-        } else {
-          // 避免在新的浏览器中使用它，因为它正在被弃用。
-          _this.thisVideo.src = window.URL.createObjectURL(stream)
-        }
-        _this.thisVideo.onloadedmetadata = function (e) {
-          console.log(e);
-          _this.thisVideo.play()
-        }
-      }).catch(err => {
-        this.$notify({
-          title: '警告',
-          message: '没有开启摄像头权限或浏览器版本不兼容.',
-          type: 'warning'
-        });
-        console.log(err)
       })
+      if (deleteFlag) {
+        this.existUrlList.splice(delIndex,1)
+      }
+      else {
+        imgInfo.tempID = Math.random()
+        this.existUrlList.push(imgInfo)
+      }
     },
-
-    // 拍照功能
-    setImage() {
-      var _this = this
-      // 点击，canvas画图
-      _this.thisContext.drawImage(_this.thisVideo, 0, 0, _this.videoWidth, _this.videoHeight)
-      // 获取图片base64链接
-      var image = this.thisCancas.toDataURL('image/jpg')
-      _this.imgSrc = image
-
+    doSave() {
+      if (this.existUrlList.length > 0) {
+        let saveForm = {
+          fileId:this.fileId,
+          tags:[]
+        }
+        this.existUrlList.forEach(item => {
+          saveForm.tags.push({
+            tagKey:item.tagKey,
+            leftStart:item.leftStart,
+            topStart:item.topStart,
+          })
+        })
+        saveSticker(saveForm).then(json => {
+          console.log(json)
+          // this.$router.push({ path:'/step6', query: {fileUrl: this.fileUrl}});
+        })
+      }
+      else {
+        this.$router.push({ path:'/step6', query: {fileUrl: this.fileUrl}});
+      }
     },
-
-    // 关闭摄像头
-
-    stopNavigator () {
-      this.thisVideo.srcObject.getTracks()[0].stop()
+    doReset() {
+      this.existUrlList = []
+    },
+    doEnd(event) {
+      console.log(event)
+      console.log(event.item)
+      console.log(event.item.offsetLeft)
+      // div.offsetLeft
+      console.log(999)
     }
-
   }
 }
 </script>
 
-<style lang="less" scoped>
-.step-5-bg {
+<style scoped lang="less">
+.step-4-bg {
   position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: url("../assets/step-5-bg.jpg") no-repeat center;
-  background-size: 100%;
-  video,canvas,.tx_img {
-    -moz-transform:scaleX(-1);
-    -webkit-transform:scaleX(-1);
-    -o-transform:scaleX(-1);
-    transform:scaleX(-1);
+}
+.title {
+  text-align: center;
+  color: yellow;
+
+  h2 {
+    display: inline-block;
+    margin-top: 10px;
   }
+
+  .save{
+    span {
+
+    }
+  }
+  .reset{
+    span {
+      position: absolute;
+      left: 20px;
+      top: 15px;
+    }
+  }
+
 }
 </style>
