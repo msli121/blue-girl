@@ -1,10 +1,10 @@
 <template>
-  <el-carousel :interval="10000" trigger="click" :height="imgHeight">
+  <el-carousel :interval="2000" trigger="click" :height="imgHeight">
     <el-carousel-item v-for="item in cardList" :key="item.id">
       <img
           @click="handleStepClick(item.name)"
           ref="imgH"
-          style="width: 100%"
+          style="width: 100%;"
           class="medium"
           :src="item.value"
           alt=""
@@ -75,6 +75,10 @@ export default {
   opacity: 0.75;
   line-height: 200px;
   margin: 0;
+}
+
+/deep/ .el-carousel__container {
+  height: 100%;
 }
 
 .el-carousel__item:nth-child(2n) {

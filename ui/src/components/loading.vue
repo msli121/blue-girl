@@ -16,9 +16,6 @@
           <el-progress :percentage="processNumber"></el-progress>
         </div>
       </div>
-<!--      <div class="bar">-->
-<!--        <div class="progress"></div>-->
-<!--      </div>-->
     </div>
   </div>
 </template>
