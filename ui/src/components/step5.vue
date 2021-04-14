@@ -9,7 +9,7 @@
       <!--      ;position: absolute;top: 40%-->
       <draggable v-model="existUrlList" group="people" @start="drag=true" @end="doEnd">
         <el-image v-for="item in existUrlList" :key="item.tempID"
-                  style="position:absolute;width: 100px;height: 100px;padding: 5px"
+                  style="position:absolute;width: 300px;height: 300px;padding: 5px"
                   :style="item.style"
                   :src="item.url"
                   :fit="imageFit"
@@ -27,15 +27,17 @@
 <!--      </div>-->
       <el-image v-for="item in stickUrlList" :key="item.tempID"
                 @click="handleStickerClick(item)"
-                style="width: 100px;height: 100px;padding: 5px;opacity: 1"
-                :src="item.url"
+                style="width: 150px;height: 150px;padding: 5px;opacity: 1"
+                :src="imgUrl"
                 :fit="imageFit"
       ></el-image>
+      :src="item.url"
     </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
 import draggable from 'vuedraggable'
 import {saveSticker} from "@/server/api";
 
@@ -48,7 +50,6 @@ export default {
   },
 
   created() {
-    console.log(this.$route.query)
     this.fileId = this.$route.query.mergedId
     this.imgUrl = this.$route.query.mergedUrl
     this.fileUrl = this.$route.query.qrCodeUrl
@@ -67,48 +68,58 @@ export default {
       stickUrlList:[
         {
           tagKey:'sticker1.png',
-          leftStart:100,
-          topStart:100,
+          leftStart:250,
+          topStart:250,
           urlString:'../assets/sticker1.png',
           url:require("../assets/sticker1.png"),
           tempID:Math.random(),
-          style:'top:100px;left:100px',
+          style:'top:250px;left:250px',
         },
         {
           tagKey:'sticker2.png',
-          leftStart:0,
-          topStart:550,
+          leftStart:120,
+          topStart:1300,
           urlString:'../assets/sticker2.png',
           url:require("../assets/sticker2.png"),
           tempID:Math.random(),
-          style:'position:absolute;bottom:200px;left:0',
+          style:'top:1300px;left:120px',
         },
         {
           tagKey:'sticker3.png',
-          leftStart:100,
-          topStart:335,
+          leftStart:800,
+          topStart:700,
           urlString:'../assets/sticker3.png',
           url:require("../assets/sticker3.png"),
           tempID:Math.random(),
-          style:'position:absolute;bottom:400px;right:0',
+          style:'top:700px;left:800px',
         },
         {
           tagKey:'sticker4.png',
-          leftStart:0,
-          topStart:400,
+          leftStart:100,
+          topStart:600,
           urlString:'../assets/sticker4.png',
           url:require("../assets/sticker4.png"),
           tempID:Math.random(),
-          style:'position:absolute;bottom:300px;left:0',
+          style:'top:600px;left:100px',
         },
-        // {
-        //   url:require("../assets/sticker5.png"),
-        //   tempID:Math.random()
-        // },
-        // {
-        //   url:require("../assets/sticker6.png"),
-        //   tempID:Math.random()
-        // },
+        {
+          tagKey:'sticker5.png',
+          leftStart:700,
+          topStart:250,
+          urlString:'../assets/sticker5.png',
+          url:require("../assets/sticker5.png"),
+          tempID:Math.random(),
+          style:'top:250px;left:700px',
+        },
+        {
+          tagKey:'sticker6.png',
+          leftStart:0,
+          topStart:550,
+          urlString:'../assets/sticker6.png',
+          url:require("../assets/sticker6.png"),
+          tempID:Math.random(),
+          style:'top:550px;left:0',
+        },
       ],
       existUrlList:[],
     };
@@ -138,7 +149,7 @@ export default {
     doSave() {
       if (this.existUrlList.length > 0) {
         let saveForm = {
-          fileId:this.fileId,
+          fileId:parseInt(this.fileId),
           tags:[]
         }
         this.existUrlList.forEach(item => {
@@ -148,10 +159,15 @@ export default {
             topStart:item.topStart,
           })
         })
-        saveSticker(saveForm).then(json => {
-          console.log(json)
-          // this.$router.push({ path:'/step6', query: {fileUrl: this.fileUrl}});
+        axios.post("https://www.performercn.com/api/file/tag", saveForm, {
+              "Content-Type": "multipart/form-data",
+            }).then(json => {
+          this.$router.push({ path:'/step6', query: { fileUrl: json.data.qrCode.fileUrl }});
         })
+        // saveSticker(saveForm).then(json => {
+        //   console.log(json)
+        //   // this.$router.push({ path:'/step6', query: {fileUrl: this.fileUrl}});
+        // })
       }
       else {
         this.$router.push({ path:'/step6', query: {fileUrl: this.fileUrl}});
@@ -174,6 +190,7 @@ export default {
 <style scoped lang="less">
 .step-4-bg {
   position: relative;
+  height: 1920px;
 }
 .title {
   text-align: center;
