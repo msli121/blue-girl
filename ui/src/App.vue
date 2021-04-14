@@ -5,6 +5,10 @@
 </template>
 
 <style lang="less">
+#app{
+  height: 100%;
+  width: 100%;
+}
   html, body {
   background-color: #161b29;
   margin: 0 auto;
