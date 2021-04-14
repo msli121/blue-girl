@@ -1,5 +1,4 @@
 import axios from "axios";
-import Qs from "qs";
 import apiBaseUrl from "./baseUrl";
 
 const instance = axios.create({
@@ -79,21 +78,5 @@ export function post(url, data) {
     })
 }
 
-/**
- * post方法，参数序列化
- * @param {String} url [请求的url地址]
- * @param {Object} params [请求时携带的参数]
- */
-export function qspost(url, params) {
-    return new Promise((resolve, reject) => {
-        instance.post(url, Qs.stringify(params))
-            .then(res => {
-                resolve(res.data);
-            })
-            .catch(err => {
-                reject(err.data)
-            })
-    });
-}
 
 export default instance;
