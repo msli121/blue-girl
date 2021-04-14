@@ -185,16 +185,17 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
             Graphics2D canvas = mainImage.createGraphics();
             request.getTags().forEach(tagItem -> {
                 try {
-                    File tagFile = (File) baseCache.getTenHoursCache().get(tagItem.getTagKey(), () -> {
+                    log.info("贴纸名称 >> ：" + tagItem.getTagKey());
+                    BufferedImage tagImage = (BufferedImage) baseCache.getTenHoursCache().get(tagItem.getTagKey(), () -> {
                         String tagFilePath = "static/" + tagItem.getTagKey();
                         // 获取静态 tag 图片
                         ClassPathResource classPathResource = new ClassPathResource(tagFilePath);
-                        return classPathResource.getFile();
+                        BufferedImage bufferedImage = ImageIO.read(classPathResource.getInputStream());
+                        return bufferedImage;
                     });
-                    BufferedImage tagImage = ImageIO.read(tagFile);
                     // 绘制 tag 图到基本图
                     canvas.drawImage(tagImage, tagItem.getLeftStart(), tagItem.getTopStart(), null);
-                } catch (ExecutionException | IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     throw new BusinessException("-1", "获取贴纸失败");
                 }

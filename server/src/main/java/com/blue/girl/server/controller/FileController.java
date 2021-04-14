@@ -78,6 +78,7 @@ public class FileController {
     @PostMapping("/tag")
     public ApiResult mergeTags(@RequestBody TagMergeRequest request) {
         log.info(">>>>>>>>>>>>>> 进入贴纸融合接口");
+        log.info("入参 " + JSON.toJSONString(request));
         long startTime = System.currentTimeMillis();
         FileRecordEntity tagPhoto = fileRecordService.getMergedPhotoWithTags(request, downloadUrl);
         FileRecordEntity qrCode = fileRecordService.getQrCodeUrl(tagPhoto.getFileUrl(), downloadUrl);
