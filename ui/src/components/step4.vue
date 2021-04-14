@@ -30,7 +30,7 @@
       <!-- 重拍 -->
       <el-button
         style="font-size: 40px"
-        @click="getCompetence()"
+        @click="goStep3()"
         circle
         icon="el-icon-camera"
         type="danger"
@@ -93,6 +93,10 @@ export default {
     this.init();
   },
   methods: {
+    goStep3() {
+      this.$router.push({path:'/step3'})
+    },
+
     init() {
       this.getCompetence();
     },
@@ -235,6 +239,7 @@ export default {
               message: '拍摄成功',
               type: 'success'
             })
+            this.backgroundImg = this.queryInfo.mergedUrl
             console.log(233, this.queryInfo)
           } else {
             this.loadingInstance.close();
