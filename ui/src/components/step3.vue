@@ -1,6 +1,11 @@
 <template>
-  <el-carousel :interval="2000" trigger="click" :height="imgHeight">
-    <el-carousel-item v-for="item in cardList" :key="item.id">
+  <el-carousel :interval="3000"
+               :autoplay="false"
+               arrow="always"
+               trigger="click">
+    <el-carousel-item
+        v-for="item in cardList"
+                      :key="item.id">
       <img
           @click="handleStepClick(item.name)"
           ref="imgH"
@@ -28,22 +33,22 @@ export default {
       {
         id: 1,
         name: "dzq_2.png",
-        value: require("../assets/dzq_2.png")
+        value: require("../assets/step3_overall/dzq_2.jpg")
       },
       {
         id: 2,
-        name: "dzq_1.png",
-        value: require("../assets/dzq_1.jpg")
+        name: "dzq_1.jpg",
+        value: require("../assets/step3_overall/dzq_1.jpg")
       },
       {
         id: 3,
         name: "dzq_3.png",
-        value: require("../assets/dzq_3.png")
+        value: require("../assets/step3_overall/dzq_3.jpg")
       },
       {
         id: 4,
         name: "dzq_4.jpg",
-        value: require("../assets/dzq_4.jpg")
+        value: require("../assets/step3_overall/dzq_4.jpg")
       }
     ];
   },
@@ -68,7 +73,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less">
 .el-carousel__item h3 {
   color: #475669;
   font-size: 14px;
@@ -79,6 +84,19 @@ export default {
 
 /deep/ .el-carousel__container {
   height: 100%;
+}
+.el-carousel{
+  height: 100%;
+  .el-carousel__container{
+    height: 100%;
+    img{
+      height: 100%!important;
+    }
+    .el-carousel__arrow{
+      background: cornflowerblue;
+      box-shadow: white 0 0 10px;
+    }
+  }
 }
 
 .el-carousel__item:nth-child(2n) {
