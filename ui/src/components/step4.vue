@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="p-step4">
     <div class="camera_outer">
       <video
         id="videoCamera"
@@ -19,9 +19,13 @@
       </div>
     </div>
     <div class="dzq_bg" style="width:100%; height:90%; display: none; position: fixed; top: 0; left: 0; bottom: 0; right: 0;">
-      <img style="float: right; width:100%; height:100%;" :src="backgroundImg" class="dzq_img" />
+      <img style="float: right; width:100%; height:100%;"
+           :src="backgroundImg"
+           class="dzq_img" />
     </div>
-    <div class="confirm" v-if="confirmPhoto">
+    <div class="confirm"
+         :class="confirmPhoto?'p-confirm-photo':''"
+         v-if="confirmPhoto">
       <!-- 重拍 -->
       <el-button
         style="font-size: 40px"
@@ -247,5 +251,14 @@ export default {
 }
 .confirm {
   text-align: center;
+  position: absolute;
+  bottom: 0;
+  margin-left: calc(50% - 33px);
+}
+.p-confirm-photo{
+  margin-left: calc(50% - 80px);
+}
+.p-step4{
+  height: 100%;
 }
 </style>

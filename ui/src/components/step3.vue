@@ -27,17 +27,17 @@ export default {
     this.cardList = [
       {
         id: 1,
-        name: "dzq_2.jpg",
+        name: "dzq_2.png",
         value: require("../assets/dzq_2.png")
       },
       {
         id: 2,
-        name: "dzq_1.jpg",
+        name: "dzq_1.png",
         value: require("../assets/dzq_1.png")
       },
       {
         id: 3,
-        name: "dzq_3.jpg",
+        name: "dzq_3.png",
         value: require("../assets/dzq_3.png")
       },
       {
