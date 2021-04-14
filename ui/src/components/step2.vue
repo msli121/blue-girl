@@ -1,5 +1,5 @@
 <template>
-  <div class="step-2-bg">
+  <div class="step-1-bg">
     <el-image @click="handleStepClick"
         style="width: 100%; height: 100%"
         :src="url"
@@ -9,10 +9,10 @@
 
 <script>
 export default {
-  name: "step2",
+  name: "step1",
   data() {
     return {
-      url: require("../assets/step-2-bg.jpg"),
+      url: require("../assets/step-1-bg.jpg"),
       fit: "fill"
     };
   },
@@ -25,8 +25,8 @@ export default {
 </script>
 
 <style>
-.step-2-bg {
-  height: 100%;
+.step-1-bg {
   width: 100%;
+  height: 100%;
 }
 </style>
