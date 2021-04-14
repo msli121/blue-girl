@@ -187,12 +187,12 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
         try {
             // 主要图片
             Image mainImage = ImageIO.read(mainFile);
-            //获取人物照片宽高
+            // 获取人物照片宽高
             int width = mainImage.getWidth(null);
             int height = mainImage.getHeight(null);
-            //创建一个画布，设置宽高（这里人物照片宽高就是画布宽高）
-            BufferedImage thumbImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            Graphics2D canvas = thumbImage.createGraphics();
+            // 创建一个画布，设置宽高（这里人物照片宽高就是画布宽高）
+            BufferedImage mainBufferImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            Graphics2D canvas = mainBufferImage.createGraphics();
             request.getTagItems().forEach(tagItem -> {
                 try {
                     File tagFile = (File) baseCache.getTenHoursCache().get(tagItem.getTagKey(), () -> {
@@ -200,14 +200,17 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
                         // 获取静态 tag 图片 file
                         return new ClassPathResource(tagFilePath).getFile();
                     });
-                    Image tagImage = ImageIO.read(tagFile);
-                    // 绘制 tag 图
-                    canvas.drawImage(tagImage.getScaledInstance(width,height, Image.SCALE_SMOOTH), 0, 0, null);
+                    BufferedImage tagImage = ImageIO.read(tagFile);
+                    // 绘制 tag 图到基本图
+                    canvas.drawImage(tagImage, tagItem.getLeftStart(), tagItem.getTopStart(), null);
                 } catch (ExecutionException | IOException e) {
                     e.printStackTrace();
                     throw new BusinessException("-1", "获取 贴纸失败");
                 }
             });
+            // 释放图形上下文使用的系统资源
+            canvas.dispose();
+            // 输出图片到本地
         } catch (IOException e) {
             e.printStackTrace();
             throw new BusinessException("-1", "读取文件异常");
@@ -290,6 +293,10 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
         } catch (Exception e) {
             throw new BusinessException("-1", "连接模型服务器失败，请稍后再试");
         }
+    }
+
+    private FileRecordEntity saveBufferImageToLocalServer(BufferedImage image) {
+        return null;
     }
 
     private FileRecordEntity saveBase64FileToLocalServer(String base64Str, String downloadUrl) {
