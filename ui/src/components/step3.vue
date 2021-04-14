@@ -2,13 +2,13 @@
   <el-carousel :interval="10000" trigger="click" :height="imgHeight">
     <el-carousel-item v-for="item in cardList" :key="item.id">
       <img
-        @click="handleStepClick(item.name)"
-        ref="imgH"
-        style="width: 100%"
-        class="medium"
-        :src="item.value"
-        alt=""
-        @load="imgLoad"
+          @click="handleStepClick(item.name)"
+          ref="imgH"
+          style="width: 100%"
+          class="medium"
+          :src="item.value"
+          alt=""
+          @load="imgLoad"
       />
     </el-carousel-item>
   </el-carousel>
@@ -28,17 +28,17 @@ export default {
       {
         id: 1,
         name: "dzq_2.jpg",
-        value: require("../assets/dzq_2.jpg")
+        value: require("../assets/dzq_2.png")
       },
       {
         id: 2,
         name: "dzq_1.jpg",
-        value: require("../assets/dzq_1.jpg")
+        value: require("../assets/dzq_1.png")
       },
       {
         id: 3,
         name: "dzq_3.jpg",
-        value: require("../assets/dzq_3.jpg")
+        value: require("../assets/dzq_3.png")
       },
       {
         id: 4,
