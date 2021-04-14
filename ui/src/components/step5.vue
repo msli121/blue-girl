@@ -2,7 +2,7 @@
   <div class="step-4-bg">
     <el-image @click="handleStepClick"
               style="width: 100%; height: 100%"
-              :src="url"
+              :src="imgUrl"
               :fit="bgFit">
     </el-image>
     <div style="z-index: 999">
@@ -28,10 +28,9 @@
       <el-image v-for="item in stickUrlList" :key="item.tempID"
                 @click="handleStickerClick(item)"
                 style="width: 150px;height: 150px;padding: 5px;opacity: 1"
-                :src="imgUrl"
+                :src="item.url"
                 :fit="imageFit"
       ></el-image>
-      :src="item.url"
     </div>
   </div>
 </template>
