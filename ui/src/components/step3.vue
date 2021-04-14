@@ -33,7 +33,7 @@ export default {
       {
         id: 2,
         name: "dzq_1.png",
-        value: require("../assets/dzq_1.png")
+        value: require("../assets/dzq_1.jpg")
       },
       {
         id: 3,

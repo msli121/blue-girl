@@ -24,6 +24,7 @@
            class="dzq_img" />
     </div>
     <div class="confirm"
+         :v-loading="true"
          :class="confirmPhoto?'p-confirm-photo':''"
          v-if="confirmPhoto">
       <!-- 重拍 -->
@@ -37,9 +38,9 @@
       <!-- 保存 -->
       <el-button
         style="font-size: 40px; margin-left: 30px"
-        @click="uploadFile()"
+        @click="go()"
         circle
-        icon="el-icon-download"
+        icon="el-icon-arrow-right"
         type="success"
       ></el-button>
     </div>
@@ -58,6 +59,7 @@
 
 <script>
 import axios from "axios";
+import { Loading } from 'element-ui'
 export default {
   name: "step4",
   data() {
@@ -72,12 +74,22 @@ export default {
       bgName: "",
       confirmPhoto: false,
       file: "",
+      loadingInstance: null,
+      queryInfo: {
+        mergedUrl: '',
+        mergedId: '',
+        qrCodeUrl: ''
+      }
     };
   },
   created() {
     this.bgName = this.$route.query.name;
   },
   mounted() {
+    /*setTimeout(_=>{
+      this.loadingInstance.close();
+    },2000)*/
+
     this.init();
   },
   methods: {
@@ -169,6 +181,7 @@ export default {
       _this.imgSrc = image;
       this.dataURLtoFile(_this.imgSrc, "groupPhoto.png");
       this.$emit("refreshDataList", this.imgSrc);
+      this.uploadFile()
     },
     // base64转文件
 
@@ -194,20 +207,37 @@ export default {
     uploadFile() {
       let formData = new FormData();
       console.log(this.file);
+      console.log(211, this.bgName);
       formData.append("file", this.file);
-      formData.append("other", this.bgName)
-      console.log(formData);
+      //formData.append("other", this.bgName)
+      formData.append("other", this.bgName.replace('png', 'jpg'))
+
+      this.loadingInstance = Loading.service(
+          { fullscreen: true },
+      )
+
       axios
         .post("https://www.performercn.com/api/file/photo", formData, {
           "Content-Type": "multipart/form-data",
         })
         .then((res) => {
           if (res.data.flag === "T") {
-            this.$router.push({
+            /*this.$router.push({
               path: "/step5",
               query: { src: res.data.mergedPhoto.fileUrl },
-            });
+            });*/
+            this.loadingInstance.close()
+            this.queryInfo.mergedUrl = res.data.data.mergedPhoto.fileUrl
+            this.queryInfo.mergedId = res.data.data.mergedPhoto.id
+            this.queryInfo.qrCodeUrl = res.data.data.qrCode.fileUrl
+            this.$notify({
+              title: '成功',
+              message: '拍摄成功',
+              type: 'success'
+            })
+            console.log(233, this.queryInfo)
           } else {
+            this.loadingInstance.close();
             this.$notify.error({
               title: "错误",
               message: `出错啦！重新尝试`,
@@ -215,8 +245,16 @@ export default {
           }
         })
         .catch((err) => {
+          this.loadingInstance.close();
           console.log(err);
         });
+    },
+
+    go() {
+      this.$router.push({
+        path:'/step5',
+        query: this.queryInfo
+      })
     },
   },
 };
