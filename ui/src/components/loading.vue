@@ -28,7 +28,7 @@
 export default {
   data() {
     return {
-      processNumber: 20,
+      processNumber: 0,
     };
   },
   mounted() {
