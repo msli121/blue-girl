@@ -7,14 +7,22 @@
     </el-image>
     <div style="z-index: 999">
       <!--      ;position: absolute;top: 40%-->
-      <draggable v-model="existUrlList" group="people" @start="drag=true" @end="doEnd">
-        <el-image v-for="item in existUrlList" :key="item.tempID"
-                  style="position:absolute;width: 300px;height: 300px;padding: 5px"
-                  :style="item.style"
+      <vue-drag-resize v-for="item in existUrlList" :key="item.tempID" :x="item.leftStart" :y="item.topStart" @dragstop="(event) => doEnd(event,item)">
+        <el-image style="position:absolute;width: 300px;height: 300px;padding: 5px"
+
                   :src="item.url"
                   :fit="imageFit"
         ></el-image>
-      </draggable>
+<!--        :style="item.style"-->
+      </vue-drag-resize>
+<!--      <draggable v-model="existUrlList" group="people" @start="drag=true" @end="doEnd">-->
+<!--        <el-image v-for="item in existUrlList" :key="item.tempID"-->
+<!--                  style="position:absolute;width: 300px;height: 300px;padding: 5px"-->
+<!--                  :style="item.style"-->
+<!--                  :src="item.url"-->
+<!--                  :fit="imageFit"-->
+<!--        ></el-image>-->
+<!--      </draggable>-->
     </div>
     <div style="z-index:999;background-color: #111721;position: absolute;bottom: 0;width: 100%;opacity: .85">
       <div style="width: 100%;position: relative;" class="title">
@@ -38,6 +46,7 @@
 <script>
 import axios from "axios";
 import draggable from 'vuedraggable'
+import VueDragResize from 'vue-drag-resize'
 import {saveSticker} from "@/server/api";
 
 export default {
@@ -45,10 +54,12 @@ export default {
   name: "step6",
 
   components:{
-    draggable
+    draggable,
+    VueDragResize
   },
 
   created() {
+    console.log(this.$route)
     this.fileId = this.$route.query.mergedId
     this.imgUrl = this.$route.query.mergedUrl
     this.fileUrl = this.$route.query.qrCodeUrl
@@ -121,6 +132,7 @@ export default {
         },
       ],
       existUrlList:[],
+      moveList:[],
     };
   },
   methods: {
@@ -152,22 +164,33 @@ export default {
           tags:[]
         }
         this.existUrlList.forEach(item => {
-          saveForm.tags.push({
-            tagKey:item.tagKey,
-            leftStart:item.leftStart,
-            topStart:item.topStart,
+          let flag = true
+          this.moveList.forEach(moveItem => {
+            if (item.tagKey === moveItem.tagKey) {
+              saveForm.tags.push({
+                tagKey:item.tagKey,
+                leftStart:moveItem.leftStart,
+                topStart:moveItem.topStart,
+              })
+              flag = false
+            }
           })
+          if (flag) {
+            console.log(9999)
+            saveForm.tags.push({
+              tagKey:item.tagKey,
+              leftStart:item.leftStart,
+              topStart:item.topStart,
+            })
+          }
         })
+        console.log(saveForm)
         axios.post("https://www.performercn.com/api/file/tag", saveForm, {
               "Content-Type": "application/json;charset=UTF-8",
             }).then(json => {
              /* console.log("json", json);*/
               this.$router.push({ path:'/step6', query: { fileUrl: json.data.data.qrCode.fileUrl }});
         })
-        // saveSticker(saveForm).then(json => {
-        //   console.log(json)
-        //   // this.$router.push({ path:'/step6', query: {fileUrl: this.fileUrl}});
-        // })
       }
       else {
         this.$router.push({ path:'/step6', query: {fileUrl: this.fileUrl}});
@@ -176,12 +199,28 @@ export default {
     doReset() {
       this.existUrlList = []
     },
-    doEnd(event) {
-      console.log(event)
-      console.log(event.item)
-      console.log(event.item.offsetLeft)
-      // div.offsetLeft
-      console.log(999)
+    doEnd(event,item) {
+      let flag = true
+      this.moveList.forEach(moveItem => {
+        if (moveItem.tagKey === item.tagKey) {
+          moveItem.leftStart = event.left
+          moveItem.topStart = event.top
+          flag = false
+        }
+      })
+      if (flag) {
+        this.moveList.push({
+          tagKey:item.tagKey,
+          leftStart:event.left,
+          topStart:event.top,
+          urlString:item.urlString,
+          url:item.url,
+          tempID:Math.random(),
+          style:item.style,
+        })
+      }
+      // console.log(this.moveList)
+      // console.log(this.existUrlList)
     }
   }
 }
