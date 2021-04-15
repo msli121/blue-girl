@@ -73,7 +73,7 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .el-carousel__item h3 {
   color: #475669;
   font-size: 14px;
@@ -82,14 +82,18 @@ export default {
   margin: 0;
 }
 
-/deep/ .el-carousel__container {
+/deep/.el-carousel__container {
+  height: 100%;
+}
+.el-carousel__container {
+  position: relative;
   height: 100%;
 }
 .el-carousel{
   height: 100%;
   .el-carousel__container{
-    height: 100%;
-    img{
+    height: 100% !important;
+    img {
       height: 100%!important;
     }
     .el-carousel__arrow{
@@ -102,11 +106,8 @@ export default {
   }
 }
 
-.el-carousel__item:nth-child(2n) {
-  background-color: #99a9bf;
-}
-
-.el-carousel__item:nth-child(2n + 1) {
-  background-color: #d3dce6;
+.el-carousel__container {
+  position: relative;
+  height: 100% !important;
 }
 </style>
