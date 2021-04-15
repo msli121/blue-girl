@@ -14,9 +14,9 @@
         :height="videoHeight"
       ></canvas>
 
-      <div v-if="imgSrc" class="img_bg_camera">
+<!--      <div v-if="imgSrc" class="img_bg_camera">
         <img :src="imgSrc" alt="" class="tx_img" />
-      </div>
+      </div>-->
     </div>
     <div class="dzq_bg" style="width:100%; height:90%; display: none; position: fixed; top: 0; left: 0; bottom: 0; right: 0;">
       <img style="float: right; width:100%; height:100%;"
