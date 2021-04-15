@@ -2,6 +2,7 @@ package com.blue.girl.server.service.impl;
 
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.blue.girl.server.dto.TagMergeRequest;
 import com.blue.girl.server.entity.FileRecordEntity;
 import com.blue.girl.server.exception.BusinessException;
@@ -309,11 +310,14 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
         }
     }
 
-    private FileRecordEntity saveBase64FileToLocalServer(String base64Str, String downloadUrl) {
+    private FileRecordEntity saveBase64FileToLocalServer(String resultStr, String downloadUrl) {
         // 判断传参
-        if(StringUtils.isEmpty(base64Str)) {
+        if(StringUtils.isEmpty(resultStr) || !resultStr.contains("base64")) {
             throw new BusinessException("-1", "模型接口返回为空");
         }
+        // jsonStr -> JsonObject
+        JSONObject mergedObj = JSON.parseObject(resultStr);
+        String base64Str = mergedObj.getString("base64");
         // 生成本地文件
         String fileRootDir = generateFileRootDir() + File.separator;
         String fileName = SysRandomUtil.getRandomString(16) + ".jpg";
