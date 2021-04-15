@@ -24,7 +24,7 @@ export default {
   name: "step6",
   data() {
     return {
-      url: require("../assets/step-6-bg.jpg"),
+      url: require("@/assets/step-6-bg.jpg"),
       fit: "fill",
       loading: true,
       loadingInstance: null,

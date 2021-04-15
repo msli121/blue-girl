@@ -159,9 +159,10 @@ export default {
           })
         })
         axios.post("https://www.performercn.com/api/file/tag", saveForm, {
-              "Content-Type": "multipart/form-data",
+              "Content-Type": "application/json;charset=UTF-8",
             }).then(json => {
-          this.$router.push({ path:'/step6', query: { fileUrl: json.data.qrCode.fileUrl }});
+              console.log("json", json);
+              this.$router.push({ path:'/step6', query: { fileUrl: json.data.qrCode.fileUrl }});
         })
         // saveSticker(saveForm).then(json => {
         //   console.log(json)

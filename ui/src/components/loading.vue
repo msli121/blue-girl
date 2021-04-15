@@ -21,7 +21,7 @@
 </template>
 
 <script>
-  import imgPreloaderList from '../config/imgPreloaderList.js';
+  import imgPreloaderList from '@/config/imgPreloaderList.js';
 export default {
   data() {
     return {
