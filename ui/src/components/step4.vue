@@ -107,6 +107,7 @@ export default {
     getCompetence() {
       this.confirmPhoto = false;
       console.log("this.bgName", this.bgName, this.photoIndex);
+      let index = this.photoIndex + 3;
       this.backgroundImg = imgPreloaderList[this.photoIndex];
       document.getElementsByClassName("dzq_bg")[0].style.display = "inline";
       // console.log(document.getElementsByClassName("dzq_bg")[0].style.display);
