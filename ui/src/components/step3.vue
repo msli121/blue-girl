@@ -57,7 +57,7 @@ export default {
     },
     handleStepClick(item) {
       this.$router.push({
-        path: '/step4',
+        path: '/step4_1',
         query: {name: item.name}});
     },
   },

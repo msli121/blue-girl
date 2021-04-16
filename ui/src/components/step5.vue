@@ -35,7 +35,7 @@
 <!--      </div>-->
       <el-image v-for="item in stickUrlList" :key="item.tempID"
                 @click="handleStickerClick(item)"
-                style="width: 170px;height: 250px;padding: 5px;opacity: 1;border: 1px white"
+                style="width: 180px;height: 250px;padding: 15px;opacity: 1;border: 1px white"
                 :src="item.url"
                 :fit="imageFit"
       ></el-image>
@@ -85,15 +85,15 @@ export default {
           tempID:Math.random(),
           style:'top:250px;left:250px',
         },
-        {
-          tagKey:'sticker2.png',
-          leftStart:120,
-          topStart:1300,
-          urlString:'../assets/sticker2.png',
-          url:require("../assets/sticker2.png"),
-          tempID:Math.random(),
-          style:'top:1300px;left:120px',
-        },
+        // {
+        //   tagKey:'sticker2.png',
+        //   leftStart:120,
+        //   topStart:1300,
+        //   urlString:'../assets/sticker2.png',
+        //   url:require("../assets/sticker2.png"),
+        //   tempID:Math.random(),
+        //   style:'top:1300px;left:120px',
+        // },
         {
           tagKey:'sticker3.png',
           leftStart:800,

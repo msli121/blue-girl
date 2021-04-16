@@ -194,8 +194,12 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
                         BufferedImage bufferedImage = ImageIO.read(classPathResource.getInputStream());
                         return bufferedImage;
                     });
+                    // 缩小一半
+                    int width = (int) (tagImage.getWidth()*0.6);
+                    int height = (int) (tagImage.getHeight()*0.6);
+                    Image scaledImage = tagImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
                     // 绘制 tag 图到基本图
-                    canvas.drawImage(tagImage, tagItem.getLeftStart(), tagItem.getTopStart(), null);
+                    canvas.drawImage(scaledImage, tagItem.getLeftStart(), tagItem.getTopStart(), null);
                 } catch (Exception e) {
                     e.printStackTrace();
                     throw new BusinessException("-1", "获取贴纸失败");

@@ -6,7 +6,18 @@
     </el-image>
     <video id="videoCamera" :width="videoWidth" :height="videoHeight" autoplay></video>
     <canvas style="display:none;" id="canvasCamera" :width="videoWidth" :height="videoHeight" ></canvas>
-
+    <!--底部按钮-->
+    <div class="confirm-panel">
+      <!-- 拍照 -->
+      <div
+          style="color:yellow;"
+          @click="setImage()"
+      >
+        <span>确认</span>
+        <br/>
+        <span class="span-en">CONFIRM</span>
+      </div>
+    </div>
   </div>
 
 </template>
@@ -174,6 +185,10 @@ export default {
             this.queryInfo.mergedId = res.data.data.mergedPhoto.id
             this.queryInfo.qrCodeUrl = res.data.data.qrCode.fileUrl
             this.backgroundImg = this.queryInfo.mergedUrl
+            this.$router.push({
+              path:'/step4_2',
+              query: this.queryInfo
+            })
             console.log("queryInfo", this.queryInfo)
           } else {
             this.loadingInstance.close();
@@ -218,11 +233,20 @@ export default {
   overflow: hidden;
   z-index: 10;
 }
-.confirm {
+.confirm-panel {
   text-align: center;
   position: absolute;
   bottom: 0;
-  margin-left: calc(50% - 33px);
+  height: 200px;
+  font-size: 72px;
+  z-index: 11;
+  width: 100%;
+  background-color: rgba(0,0,0, .5);
+  .span-en{
+    color: black;
+    //-webkit-text-stroke: 1px yellow;
+    text-shadow: 0 1px yellow, 1px 0 yellow, -1px 0 yellow, 0 -1px yellow;
+  }
 }
 .p-confirm-photo{
   margin-left: calc(50% - 80px);

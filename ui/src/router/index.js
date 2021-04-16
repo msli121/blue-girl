@@ -43,15 +43,15 @@ const routes = [
   //   component: step4,
   // },
   {
-    path: "/step4",
+    path: "/step4_1",
     name: "step4_1",
     component: step4_1,
   },
-  // {
-  //   path: "/step4_2",
-  //   name: "step4_2",
-  //   component: step4_2,
-  // },
+  {
+    path: "/step4_2",
+    name: "step4_2",
+    component: step4_2,
+  },
   {
     path: "/step5",
     name: "step5",

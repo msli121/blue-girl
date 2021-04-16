@@ -1,24 +1,14 @@
 <template>
-  <div class="step-6-bg" :v-loading="loading">
-<!--    <el-image @click="handleStepClick"-->
-<!--              style="width: 100%; height: 100%"-->
-<!--              :src="url"-->
-<!--              :fit="fit"></el-image>-->
+  <div class="step-6-bg" @click="handleStepClick">
     <img
-        @click="handleStepClick"
         class="qr-code"
         :src="url"
         @error="imgLoadError"
         @load="imgLoad"/>
-<!--    <el-image class="qr-code"-->
-<!--      :src="url"-->
-<!--      :fit="fit">-->
-<!--    </el-image>-->
   </div>
 </template>
 
 <script>
-  // import {loadImage} from "@/server/func";
   import { Loading } from 'element-ui'
 export default {
   name: "step6",
@@ -34,7 +24,12 @@ export default {
     if(this.$route.query.fileUrl) {
       this.url = this.$route.query.fileUrl;
     } else {
-      this.url = "https://www.performercn.com/api/file/download/141";
+      this.$notify({
+        title: "出错啦",
+        type: "error",
+        message: "出错啦，照片不存在"
+      });
+      this.$router.replace({path: "/step1"});
     }
     // 等待
     this.loadingInstance = Loading.service(
