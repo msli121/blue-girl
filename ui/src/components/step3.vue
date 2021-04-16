@@ -95,11 +95,19 @@ export default {
       height: 100%!important;
     }
     .el-carousel__arrow{
-      background: #8664ed;
-      box-shadow: white 0 0 10px;
+      //background: #8664ed;
+      //box-shadow: #00489a 0 0 10px;
+      color: #0178ff;
+      background-color: rgba(255,255,255,0);
       width: 76px;
       height: 76px;
-      font-size: 36px;
+      >i{
+        font-size: 72px;
+        font-weight: bolder;
+        /*&:before{
+          box-shadow: #00489a 0 0 10px;
+        }*/
+      }
     }
   }
 }
