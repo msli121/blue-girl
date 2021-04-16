@@ -22,68 +22,29 @@
 
 <script>
   import imgPreloaderList from "../config/imgPreloaderList.js";
-export default {
+  import {imgsPreloader} from "../config/imgPreloader"
+
+  export default {
   data() {
     return {
       processNumber: 0,
     };
   },
-  mounted() {
-    // 加载图片
-    this.loadingPicture();
-    // let that = this;
-    // this.sleep(100).then(() => {
-    //   that.loadingPicture();
-    // })
+  created() {
+    this.loadImg()
   },
   methods: {
-    sleep(ms) {
-      return new Promise(resolve =>
-          setTimeout(resolve, ms)
-      )
-    },
-    loadingPicture() {
-      (async () => {
-        await this.imgsPreloader(imgPreloaderList);
-        // 跳转页面
-        console.log("加载完毕，跳转页面")
-        await this.$router.replace({path: "/step1"});
-      })();
-    },
-    imgPreloader(url) {
-      return new Promise((resolve, reject) => {
-        let image = new Image();
-        image.src = url;
-        image.onload = () => {
-          console.log("图片 " + url + " 加载成功");
-          resolve();
-        };
-        image.onerror = () => {
-          console.log("图片 " + url + " 加载失败");
-          reject();
-        };
-      });
-    },
+    loadImg(){
+      const res = imgsPreloader(imgPreloaderList)
 
-    imgsPreloader(imgs) {
-      let that = this;
-      let processDistance = 0;
-      console.log("共需下载 ", imgs.length, " 张图片");
-      if(imgs.length > 0) {
-        this.processNumber = 0;
-        processDistance = 100 / imgs.length;
-      } else {
-        this.processNumber = 100;
-      }
-      let promiseArr = [];
-      imgs.forEach(element => {
-        promiseArr.push(this.imgPreloader(element));
-        that.processNumber = that.processNumber + processDistance;
-        if(that.processNumber > 100) {
-          that.processNumber = 100;
-        }
-      });
-      return Promise.all(promiseArr);
+      console.log('开始渲染---渲染中。。。')
+      this.processNumber = 0
+      res.then(val=>{
+        this.processNumber = 100
+        console.log('渲染成功')
+        console.log(23, val)//['图片加载成功', '图片加载成功']
+        this.$router.push({path: "/step1"})
+      })
     }
   }
 }
