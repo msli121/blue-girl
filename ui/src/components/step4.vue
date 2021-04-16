@@ -2,23 +2,16 @@
   <div class="p-step4">
     <div class="camera_outer">
       <video
-        id="videoCamera"
-        :width="videoWidth"
-        :height="videoHeight"
+        id="videoCamera" style="width: auto"
         autoplay
       ></video>
       <canvas
-        style="display: none"
-        id="canvasCamera"
-        :width="videoWidth"
-        :height="videoHeight"
-      ></canvas>
-
-<!--      <div v-if="imgSrc" class="img_bg_camera">
-        <img :src="imgSrc" alt="" class="tx_img" />
-      </div>-->
+        style="display: none;height: 100%; width: 100%;"
+        id="canvasCamera">
+      </canvas>
     </div>
-    <div class="dzq_bg" style="width:100%; height:90%; display: none; position: fixed; top: 0; left: 0; bottom: 0; right: 0;">
+    <div class="dzq_bg" style="width:100%; height:100%;
+          display: none; position: fixed; top: 0; left: 0; bottom: 0; right: 0;">
       <img style="float: right; width:100%; height:100%;"
            :src="backgroundImg"
            class="dzq_img" />
@@ -228,10 +221,6 @@ export default {
         })
         .then((res) => {
           if (res.data.flag === "T") {
-            /*this.$router.push({
-              path: "/step5",
-              query: { src: res.data.mergedPhoto.fileUrl },
-            });*/
             this.loadingInstance.close()
             this.queryInfo.mergedUrl = res.data.data.mergedPhoto.fileUrl
             this.queryInfo.mergedId = res.data.data.mergedPhoto.id
