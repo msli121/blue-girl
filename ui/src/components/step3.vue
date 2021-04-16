@@ -24,6 +24,7 @@ export default {
   name: "step3",
   data() {
     return {
+      imgHeight: "0px",
       cardList: [],
     };
   },
@@ -47,6 +48,13 @@ export default {
     ];
   },
   methods: {
+    imgLoad() {
+      console.log("图像加载完毕");
+      this.$nextTick(() => {
+        this.imgHeight = `${this.$refs.imgH[0].height}px`;
+        // console.log(this.imgHeight)
+      });
+    },
     handleStepClick(item) {
       this.$router.push({
         path: '/step4',
