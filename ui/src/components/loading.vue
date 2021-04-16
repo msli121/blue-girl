@@ -12,8 +12,9 @@
         <div class="eight common"></div>
       </div>
       <div>
-        <div class="self-progress">
-          <el-progress :percentage="processNumber"></el-progress>
+        <div class="self-progress" style="color: white">
+          {{processState}}
+<!--          <el-progress :percentage="processNumber"></el-progress>-->
         </div>
       </div>
     </div>
@@ -28,6 +29,7 @@
   data() {
     return {
       processNumber: 0,
+      processState: '加载中...'
     };
   },
   created() {
@@ -42,6 +44,7 @@
       res.then(val=>{
         this.processNumber = 100
         console.log('渲染成功')
+        this.processState = '加载完成'
         console.log(23, val)//['图片加载成功', '图片加载成功']
         this.$router.push({path: "/step1"})
       })
