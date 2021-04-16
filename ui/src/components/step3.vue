@@ -20,7 +20,6 @@
 </template>
 
 <script>
-  import imgPreloaderList from "../config/imgPreloaderList.js";
 export default {
   name: "step3",
   data() {
@@ -33,21 +32,18 @@ export default {
     this.cardList = [
       {
         id: 1,
-        name: "scene_1.jpg",
-        photoIndex: 3,
-        value: imgPreloaderList[3]
+        name: "scene_1.png",
+        value: require("../assets/scene_origin/scene_1.png")
       },
       {
         id: 2,
-        name: "scene_2.jpg",
-        photoIndex: 4,
-        value: imgPreloaderList[4]
+        name: "scene_2.png",
+        value: require("../assets/scene_origin/scene_2.png")
       },
       {
         id: 3,
-        name: "scene_3.jpg",
-        photoIndex: 5,
-        value: imgPreloaderList[5]
+        name: "scene_3.png",
+        value: require("../assets/scene_origin/scene_3.png")
       }
     ];
   },
@@ -55,15 +51,11 @@ export default {
     imgLoad() {
       console.log("图像加载完毕");
       this.loading = false;
-      // this.$nextTick(() => {
-      //   this.imgHeight = `${this.$refs.imgH[0].height}px`;
-      //   // console.log(this.imgHeight)
-      // });
     },
     handleStepClick: function(item) {
       this.$router.push({
         path: '/step4',
-        query: {name: item.name, photoIndex: item.photoIndex }});
+        query: {name: item.name}});
     },
   },
   mounted() {
