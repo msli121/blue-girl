@@ -3,11 +3,11 @@
                :autoplay="false"
                arrow="always"
                trigger="click">
-    <el-carousel-item
+    <el-carousel-item :v-loading="loading"
         v-for="item in cardList"
                       :key="item.id">
       <img
-          @click="handleStepClick(item.name)"
+          @click="handleStepClick(item)"
           ref="imgH"
           style="width: 100%;"
           class="medium"
@@ -20,11 +20,12 @@
 </template>
 
 <script>
+  import imgPreloaderList from "../config/imgPreloaderList.js";
 export default {
   name: "step3",
   data() {
     return {
-      imgHeight: "0px",
+      loading: true,
       cardList: [],
     };
   },
@@ -32,35 +33,37 @@ export default {
     this.cardList = [
       {
         id: 1,
-        name: "dzq_2.png",
-        value: require("../assets/step3_overall/dzq_2.jpg")
+        name: "scene_1.jpg",
+        photoIndex: 3,
+        value: imgPreloaderList[3]
       },
       {
         id: 2,
-        name: "dzq_1.jpg",
-        value: require("../assets/step3_overall/dzq_1.jpg")
+        name: "scene_2.jpg",
+        photoIndex: 4,
+        value: imgPreloaderList[4]
       },
       {
         id: 3,
-        name: "dzq_3.png",
-        value: require("../assets/step3_overall/dzq_3.jpg")
-      },
-      {
-        id: 4,
-        name: "dzq_4.jpg",
-        value: require("../assets/step3_overall/dzq_4.jpg")
+        name: "scene_3.jpg",
+        photoIndex: 5,
+        value: imgPreloaderList[5]
       }
     ];
   },
   methods: {
     imgLoad() {
-      this.$nextTick(() => {
-        this.imgHeight = `${this.$refs.imgH[0].height}px`;
-        // console.log(this.imgHeight)
-      });
+      console.log("图像加载完毕");
+      this.loading = false;
+      // this.$nextTick(() => {
+      //   this.imgHeight = `${this.$refs.imgH[0].height}px`;
+      //   // console.log(this.imgHeight)
+      // });
     },
-    handleStepClick(name) {
-      this.$router.push({ path:'/step4', query: {"name": name}});
+    handleStepClick: function(item) {
+      this.$router.push({
+        path: '/step4',
+        query: {name: item.name, photoIndex: item.photoIndex }});
     },
   },
   mounted() {

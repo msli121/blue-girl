@@ -59,7 +59,8 @@
 
 <script>
 import axios from "axios";
-import { Loading } from 'element-ui'
+import { Loading } from 'element-ui';
+import imgPreloaderList from "../config/imgPreloaderList.js";
 export default {
   name: "step4",
   data() {
@@ -72,6 +73,7 @@ export default {
       thisVideo: null,
       backgroundImg: "",
       bgName: "",
+      photoIndex: 3,
       confirmPhoto: false,
       file: "",
       loadingInstance: null,
@@ -84,6 +86,7 @@ export default {
   },
   created() {
     this.bgName = this.$route.query.name;
+    this.photoIndex = this.$route.query.photoIndex;
   },
   mounted() {
     /*setTimeout(_=>{
@@ -103,7 +106,8 @@ export default {
     // 调用权限（打开摄像头功能）
     getCompetence() {
       this.confirmPhoto = false;
-      this.backgroundImg = require("../assets/" + this.bgName);
+      console.log("this.bgName", this.bgName, this.photoIndex);
+      this.backgroundImg = imgPreloaderList[this.photoIndex];
       document.getElementsByClassName("dzq_bg")[0].style.display = "inline";
       // console.log(document.getElementsByClassName("dzq_bg")[0].style.display);
 

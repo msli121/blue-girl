@@ -1,7 +1,6 @@
 <template>
   <div class="step-4-bg">
-    <el-image @click="handleStepClick"
-              style="width: 100%; height: 100%"
+    <el-image style="width: 100%; height: 100%"
               :src="imgUrl"
               :fit="bgFit">
     </el-image>
@@ -67,7 +66,7 @@ export default {
 
   data() {
     return {
-      // url: require("../assets/step-6-bg.jpg"),
+      // url: require("../assets/step_6_bg.jpg"),
       fileId:'',
       imgUrl:'',
       fileUrl:'',
@@ -137,7 +136,7 @@ export default {
   },
   methods: {
     handleStepClick() {
-      this.$router.replace({path: "/step1"})
+      this.$router.replace({path: "/step6"})
     },
     handleStickerClick(val) {
       let imgInfo = val

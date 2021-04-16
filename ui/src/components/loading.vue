@@ -21,7 +21,7 @@
 </template>
 
 <script>
-  import imgPreloaderList from '@/config/imgPreloaderList.js';
+  import imgPreloaderList from "../config/imgPreloaderList.js";
 export default {
   data() {
     return {
@@ -29,10 +29,12 @@ export default {
     };
   },
   mounted() {
-    let that = this;
-    this.sleep(4000).then(() => {
-      that.loadingPicture();
-    })
+    // 加载图片
+    this.loadingPicture();
+    // let that = this;
+    // this.sleep(100).then(() => {
+    //   that.loadingPicture();
+    // })
   },
   methods: {
     sleep(ms) {
@@ -41,41 +43,42 @@ export default {
       )
     },
     loadingPicture() {
-      // let that = this;
       (async () => {
         await this.imgsPreloader(imgPreloaderList);
         // 跳转页面
-
-        console.log("跳转页面")
+        console.log("加载完毕，跳转页面")
         await this.$router.replace({path: "/step1"});
       })();
     },
     imgPreloader(url) {
       return new Promise((resolve, reject) => {
         let image = new Image();
+        image.src = url;
         image.onload = () => {
+          console.log("图片 " + url + " 加载成功");
           resolve();
         };
         image.onerror = () => {
+          console.log("图片 " + url + " 加载失败");
           reject();
         };
-        image.src = url;
       });
     },
 
     imgsPreloader(imgs) {
       let that = this;
-      let processItem = 0;
+      let processDistance = 0;
+      console.log("共需下载 ", imgs.length, " 张图片");
       if(imgs.length > 0) {
         this.processNumber = 0;
-        processItem = 100 / imgs.length;
+        processDistance = 100 / imgs.length;
       } else {
         this.processNumber = 100;
       }
       let promiseArr = [];
       imgs.forEach(element => {
         promiseArr.push(this.imgPreloader(element));
-        that.processNumber = that.processNumber + processItem;
+        that.processNumber = that.processNumber + processDistance;
         if(that.processNumber > 100) {
           that.processNumber = 100;
         }

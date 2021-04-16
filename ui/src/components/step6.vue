@@ -24,7 +24,7 @@ export default {
   name: "step6",
   data() {
     return {
-      url: require("@/assets/step-6-bg.jpg"),
+      url: require("@/assets/step_6_bg.jpg"),
       fit: "fill",
       loading: true,
       loadingInstance: null,
@@ -60,7 +60,7 @@ export default {
     // async drawQrCodePhoto(qrCodeUrl) {
     //   // 二维码图
     //   const qrImage = await loadImage(qrCodeUrl);
-    //   // const bgImage = await loadImage(require("../assets/step-6-bg.jpg"));
+    //   // const bgImage = await loadImage(require("../assets/step_6_bg.jpg"));
     //   console.log("qrImage ",qrImage.width, qrImage.height);
     //   this.loading = false;
     //   // console.log("w: ", bgImage.width, "h: ", bgImage.height);
@@ -80,7 +80,7 @@ export default {
   .step-6-bg {
     height: 100%;
     width: 100%;
-    background: url('../assets/step-6-bg.jpg') no-repeat;
+    background: url('../assets/step_6_bg.jpg') no-repeat;
     background-size: cover;
     position: absolute;
 }
