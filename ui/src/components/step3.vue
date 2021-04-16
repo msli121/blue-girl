@@ -3,7 +3,7 @@
                :autoplay="false"
                arrow="always"
                trigger="click">
-    <el-carousel-item :v-loading="loading"
+    <el-carousel-item
         v-for="item in cardList"
                       :key="item.id">
       <img
@@ -24,7 +24,6 @@ export default {
   name: "step3",
   data() {
     return {
-      loading: true,
       cardList: [],
     };
   },
@@ -48,10 +47,6 @@ export default {
     ];
   },
   methods: {
-    imgLoad() {
-      console.log("图像加载完毕");
-      this.loading = false;
-    },
     handleStepClick(item) {
       this.$router.push({
         path: '/step4',
