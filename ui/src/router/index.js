@@ -4,6 +4,8 @@ import step1 from "../components/step1";
 import step2 from "../components/step2";
 import step3 from "../components/step3";
 import step4 from "../components/step4";
+import step4_1 from "../components/step4_1";
+import step4_2 from "../components/step4_2";
 import step5 from "../components/step5";
 import step6 from "../components/step6";
 import loading from "../components/loading";
@@ -35,11 +37,21 @@ const routes = [
     name: "step3",
     component: step3,
   },
+  // {
+  //   path: "/step4",
+  //   name: "step4",
+  //   component: step4,
+  // },
   {
     path: "/step4",
-    name: "step4",
-    component: step4,
+    name: "step4_1",
+    component: step4_1,
   },
+  // {
+  //   path: "/step4_2",
+  //   name: "step4_2",
+  //   component: step4_2,
+  // },
   {
     path: "/step5",
     name: "step5",

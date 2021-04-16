@@ -8,12 +8,12 @@
 </template>
 
 <script>
-  import imgPreloaderList from "../config/imgPreloaderList.js";
+
 export default {
   name: "step2",
   data() {
     return {
-      url: imgPreloaderList[0],
+      url: require("@/assets/step_1_bg.jpg"),
       fit: "fill"
     };
   },
