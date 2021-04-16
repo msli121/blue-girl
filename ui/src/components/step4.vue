@@ -65,8 +65,8 @@ export default {
   name: "step4",
   data() {
     return {
-      videoWidth: 455,
-      videoHeight: 1000,
+      videoWidth: 1080,
+      videoHeight: 1920,
       imgSrc: "",
       thisCancas: null,
       thisContext: null,
