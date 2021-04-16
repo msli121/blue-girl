@@ -33,17 +33,17 @@ export default {
       {
         id: 1,
         name: "scene_1.png",
-        value: require("../assets/scene_origin/scene_1.png")
+        value: require("@/assets/scene_origin/scene_1.png")
       },
       {
         id: 2,
         name: "scene_2.png",
-        value: require("../assets/scene_origin/scene_2.png")
+        value: require("@/assets/scene_origin/scene_2.png")
       },
       {
         id: 3,
         name: "scene_3.png",
-        value: require("../assets/scene_origin/scene_3.png")
+        value: require("@/assets/scene_origin/scene_3.png")
       }
     ];
   },
@@ -88,7 +88,7 @@ export default {
   height: 100%;
 }
 .el-carousel{
-  height: 100%;
+  height: 100% !important;
   .el-carousel__container{
     height: 100% !important;
     img {
