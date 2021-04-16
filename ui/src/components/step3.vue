@@ -52,7 +52,7 @@ export default {
       console.log("图像加载完毕");
       this.loading = false;
     },
-    handleStepClick: function(item) {
+    handleStepClick(item) {
       this.$router.push({
         path: '/step4',
         query: {name: item.name}});
