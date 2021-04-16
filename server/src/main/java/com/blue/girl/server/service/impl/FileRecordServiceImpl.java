@@ -224,6 +224,10 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
             throw new BusinessException("-1", "参数错误，背景图或原图为空");
         }
         try {
+            // 主要图片
+            BufferedImage mainImage = ImageIO.read(multipartFile.getInputStream());
+            // 获取上传图片尺寸
+            log.info("上传图片的尺寸：with = " + mainImage.getWidth() + " height = " + mainImage.getHeight());
             String backgroundBase64 = (String) baseCache.getTenHoursCache().get(bgKey, () -> {
                 String localPhotoUrl = "static/" + bgKey;
                 // 获取静态 logo 图片

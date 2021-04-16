@@ -25,16 +25,17 @@
     </div>
     <div style="z-index:999;background-color: #111721;position: absolute;bottom: 0;width: 100%;opacity: .85">
       <div style="width: 100%;position: relative;" class="title">
-        <span class="reset" style="position: absolute;left: 20px;top: 15px;" @click="doReset">重置</span>
-        <h2>贴    纸</h2>
-        <span class="save" style="position: absolute;right: 20px;top: 15px;" @click="doSave">保存</span>
+        <span class="reset" style="position: absolute;left: 20px;top: 15px;font-size: 45px;color: orange" @click="doReset">重置</span>
+        <h1>贴    纸</h1>
+        <h1 style="color:white;margin-left: 30px">STICKERS</h1>
+        <span class="save" style="position: absolute;right: 20px;top: 15px;font-size: 45px;color: orange" @click="doSave">确认</span>
       </div>
 <!--      <div>-->
 <!--        <el-button>保存</el-button>-->
 <!--      </div>-->
       <el-image v-for="item in stickUrlList" :key="item.tempID"
                 @click="handleStickerClick(item)"
-                style="width: 150px;height: 150px;padding: 5px;opacity: 1"
+                style="width: 170px;height: 250px;padding: 5px;opacity: 1;border: 1px white"
                 :src="item.url"
                 :fit="imageFit"
       ></el-image>
@@ -234,14 +235,16 @@ export default {
   text-align: center;
   color: yellow;
 
-  h2 {
+  h1 {
     display: inline-block;
     margin-top: 10px;
+    font-size: 55px;
   }
 
   .save{
     span {
-
+      font-size: 45px;
+      color: orange;
     }
   }
   .reset{
