@@ -38,7 +38,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less" scoped>
 .game-bg {
   position: relative;
   height: 100%;

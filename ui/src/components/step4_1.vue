@@ -220,7 +220,7 @@ export default {
 };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .camera_outer {
   height: 100%;
   width: 100%;

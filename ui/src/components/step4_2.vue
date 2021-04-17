@@ -66,7 +66,7 @@ export default {
 };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .p-step4_2{
   position: relative;
   .confirm-panel {
