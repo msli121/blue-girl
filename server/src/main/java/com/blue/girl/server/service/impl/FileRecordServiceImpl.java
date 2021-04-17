@@ -67,21 +67,44 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
 
             response.setHeader("Pragma", "no-cache");
 
-            response.setContentType("image/jpeg");
+            response.setContentType("image/png");
 
             try {
-                File image = new File(fileRecord.getLocalAddress());
-                FileInputStream inputStream = new FileInputStream(image);
-                int length = inputStream.available();
-                byte data[] = new byte[length];
-                response.setContentLength(length);
-                String fileName = image.getName();
+                File originFile = new File(fileRecord.getLocalAddress());
+                BufferedImage originBufferImage = ImageIO.read(originFile);
+                // 原图尺寸
+                int originWidth = originBufferImage.getWidth();
+                int originHeight = originBufferImage.getHeight();
+                // 获取缩放后的图片
+                int newWidth = (int) (originWidth * 0.5);
+                int newHeight = (int) (originHeight * 0.5);
+                Image scaledImage = originBufferImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+                // 构建新图流
+                BufferedImage newBufferImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+                Graphics2D canvas = newBufferImage.createGraphics();
+                // 绘画新图
+                canvas.drawImage(scaledImage, 0, 0, null);
+                // 释放画布资源
+                canvas.dispose();
+                // 图片写入输出流中
+                String fileName = originFile.getName();
                 String fileType = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+                fileType = StringUtils.isEmpty(fileType) ? "png" : fileType;
                 response.setContentType(imageContentType.get(fileType));
-                inputStream.read(data);
-                OutputStream toClient = response.getOutputStream();
-                toClient.write(data);
-                toClient.flush();
+                log.info("下载图片 >> 内容写入输出流中 >> 文件名：[{}] 文件类型：[{}]", fileName, fileType);
+                ImageIO.write(newBufferImage, fileType, response.getOutputStream());
+//                File image = new File(fileRecord.getLocalAddress());
+//                FileInputStream inputStream = new FileInputStream(image);
+//                int length = inputStream.available();
+//                byte data[] = new byte[length];
+//                response.setContentLength(length);
+//                String fileName = image.getName();
+//                String fileType = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+//                response.setContentType(imageContentType.get(fileType));
+//                inputStream.read(data);
+//                OutputStream toClient = response.getOutputStream();
+//                toClient.write(data);
+//                toClient.flush();
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new BusinessException("-1", "图片不存在");
