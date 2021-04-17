@@ -9,7 +9,7 @@ import step4_2 from "../components/step4_2";
 import step5 from "../components/step5";
 import step6 from "../components/step6";
 import loading from "../components/loading";
-import test from "../components/Test";
+import game from "../components/game";
 
 
 Vue.use(VueRouter);
@@ -21,9 +21,9 @@ const routes = [
     component: loading,
   },
   {
-    path: "/test",
-    name: "test",
-    component: test,
+    path: "/game",
+    name: "game",
+    component: game,
   },
   {
     path: "/step1",

@@ -37,16 +37,15 @@
   },
   methods: {
     loadImg(){
-      const res = imgsPreloader(imgPreloaderList)
-
-      console.log('开始渲染---渲染中。。。')
-      this.processNumber = 0
+      const res = imgsPreloader(imgPreloaderList);
+      console.log('开始渲染---渲染中。。。');
+      this.processNumber = 0;
+      this.$router.push({path: "/game"});
       res.then(val=>{
-        this.processNumber = 100
-        console.log('渲染成功')
-        this.processState = '加载完成'
-        console.log(23, val)//['图片加载成功', '图片加载成功']
-        this.$router.push({path: "/step1"})
+        this.processNumber = 100;
+        console.log('渲染成功');
+        this.processState = '加载完成';
+        console.log(23, val)//['图片加载成功', '图片加载成功'];
       })
     }
   }
