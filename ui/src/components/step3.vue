@@ -1,6 +1,6 @@
 <template>
-  <el-carousel :interval="3000"
-               :autoplay="false"
+  <el-carousel :interval="5000"
+               :autoplay="true"
                arrow="always"
                trigger="click">
     <el-carousel-item
