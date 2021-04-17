@@ -6,15 +6,12 @@ import com.blue.girl.server.dto.TagMergeRequest;
 import com.blue.girl.server.entity.FileRecordEntity;
 import com.blue.girl.server.exception.BusinessException;
 import com.blue.girl.server.service.FileRecordService;
-import com.blue.girl.server.service.impl.FileRecordServiceImpl;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;

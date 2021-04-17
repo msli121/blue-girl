@@ -10,9 +10,6 @@ import step5 from "../components/step5";
 import step6 from "../components/step6";
 import loading from "../components/loading";
 
-//bacup
-import step3_refactor from "../components/step3_refactor";
-
 
 Vue.use(VueRouter);
 
@@ -61,11 +58,6 @@ const routes = [
     path: "/step6",
     name: "step6",
     component: step6,
-  },
-  {
-    path: "/step3_backup",
-    name: "step3_backup",
-    component: step3_refactor,
   },
 ];
 

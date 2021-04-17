@@ -35,23 +35,16 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
     @Autowired
     private BaseCache baseCache;
 
-    private static HashMap<String, String> imageContentType=new HashMap<>();
+    private static HashMap<String, String> imageContentType= new HashMap<>();
 
     static {
         imageContentType.put("jpg","image/jpeg");
-
         imageContentType.put("jpeg","image/jpeg");
-
         imageContentType.put("png","image/png");
-
         imageContentType.put("tif","image/tiff");
-
         imageContentType.put("tiff","image/tiff");
-
         imageContentType.put("ico","image/x-icon");
-
         imageContentType.put("bmp","image/bmp");
-
         imageContentType.put("gif","image/gif");
     }
 

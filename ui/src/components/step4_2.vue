@@ -31,7 +31,6 @@
 </template>
 
 <script>
-import axios from "axios";
 export default {
   name: "step4_2",
   data() {

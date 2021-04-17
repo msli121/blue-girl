@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import apiBaseUrl from "../server/baseUrl";
 import axios from "axios";
 import { Loading } from 'element-ui';
 
@@ -170,8 +171,9 @@ export default {
           { fullscreen: true },
       );
       // 发起调用请求
+      let url = apiBaseUrl + "/file/photo2";
       axios
-        .post("https://www.performercn.com/api/file/photo", formData, {
+        .post(url, formData, {
           "Content-Type": "multipart/form-data",
         }).then((res) => {
           if (res.data.flag === "T") {

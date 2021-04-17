@@ -5,33 +5,19 @@
               :fit="bgFit">
     </el-image>
     <div style="z-index: 999">
-      <!--      ;position: absolute;top: 40%-->
       <vue-drag-resize v-for="item in existUrlList" :key="item.tempID" :x="item.leftStart" :y="item.topStart" @dragstop="(event) => doEnd(event,item)">
         <el-image style="position:absolute;width: 300px;height: 300px;padding: 5px"
                   :src="item.url"
-                  :fit="imageFit"
-        ></el-image>
-<!--        :style="item.style"-->
+                  :fit="imageFit"></el-image>
       </vue-drag-resize>
-<!--      <draggable v-model="existUrlList" group="people" @start="drag=true" @end="doEnd">-->
-<!--        <el-image v-for="item in existUrlList" :key="item.tempID"-->
-<!--                  style="position:absolute;width: 300px;height: 300px;padding: 5px"-->
-<!--                  :style="item.style"-->
-<!--                  :src="item.url"-->
-<!--                  :fit="imageFit"-->
-<!--        ></el-image>-->
-<!--      </draggable>-->
     </div>
     <div style="z-index:999;background-color: #111721;position: absolute;bottom: 0;width: 100%;opacity: .85">
       <div style="width: 100%;position: relative;" class="title">
-        <span class="reset" style="position: absolute;left: 20px;top: 15px;font-size: 45px;color: orange" @click="doReset">重置</span>
+        <span class="reset" style="position: absolute;left: 10%;top: 15px;font-size: 45px;color: orange" @click="doReset">重置</span>
         <h1>贴    纸</h1>
         <h1 style="color:white;margin-left: 30px">STICKERS</h1>
-        <span class="save" style="position: absolute;right: 20px;top: 15px;font-size: 45px;color: orange" @click="doSave">确认</span>
+        <span class="save" style="position: absolute;right: 10%;top: 15px;font-size: 45px;color: orange" @click="doSave">确认</span>
       </div>
-<!--      <div>-->
-<!--        <el-button>保存</el-button>-->
-<!--      </div>-->
       <el-image v-for="item in stickUrlList" :key="item.tempID"
                 @click="handleStickerClick(item)"
                 style="width: 180px;height: 250px;padding: 15px;opacity: 1;border: 1px white"
@@ -46,7 +32,7 @@
 import axios from "axios";
 import draggable from 'vuedraggable'
 import VueDragResize from 'vue-drag-resize'
-import {saveSticker} from "@/server/api";
+import apiBaseUrl from "../server/baseUrl";
 
 export default {
 
@@ -184,7 +170,9 @@ export default {
           }
         })
         console.log(saveForm)
-        axios.post("https://www.performercn.com/api/file/tag", saveForm, {
+        // 组装 url
+        let url = apiBaseUrl + "/file/tag";
+        axios.post(url, saveForm, {
               "Content-Type": "application/json;charset=UTF-8",
             }).then(json => {
              /* console.log("json", json);*/
@@ -199,7 +187,9 @@ export default {
       this.existUrlList = []
     },
     doEnd(event,item) {
-      let flag = true
+      let flag = true;
+      console.log("fdsfsdfds");
+      console.log(event, item);
       this.moveList.forEach(moveItem => {
         if (moveItem.tagKey === item.tagKey) {
           moveItem.leftStart = event.left
@@ -228,7 +218,9 @@ export default {
 <style scoped lang="less">
 .step-4-bg {
   position: relative;
-  height: 1920px;
+  height: 100%;
+  width: 100%;
+  //height: 1920px;
 }
 .title {
   text-align: center;
