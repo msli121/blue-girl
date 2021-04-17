@@ -182,6 +182,7 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
         try {
             // 主要图片
             BufferedImage mainImage = ImageIO.read(mainFile);
+            log.info("上传图片尺寸 width = [{}], height = [{}] >> ", mainImage.getWidth(), mainImage.getHeight());
             // 生成画布
             Graphics2D canvas = mainImage.createGraphics();
             request.getTags().forEach(tagItem -> {
@@ -194,12 +195,16 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
                         BufferedImage bufferedImage = ImageIO.read(classPathResource.getInputStream());
                         return bufferedImage;
                     });
+                    // 贴纸尺寸
+                    log.info("贴纸尺寸  width = [{}], height = [{}] >> " , tagImage.getWidth(), tagImage.getHeight());
                     // 缩小一半
-                    int width = (int) (tagImage.getWidth()*0.6);
-                    int height = (int) (tagImage.getHeight()*0.6);
-                    Image scaledImage = tagImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+//                    int width = (int) (tagImage.getWidth()*0.6);
+//                    int height = (int) (tagImage.getHeight()*0.6);
+//                    int width = 180;
+//                    int height = 250;
+//                    Image scaledImage = tagImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
                     // 绘制 tag 图到基本图
-                    canvas.drawImage(scaledImage, tagItem.getLeftStart(), tagItem.getTopStart(), null);
+                    canvas.drawImage(tagImage, tagItem.getLeftStart(), tagItem.getTopStart(), null);
                 } catch (Exception e) {
                     e.printStackTrace();
                     throw new BusinessException("-1", "获取贴纸失败");
