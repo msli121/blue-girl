@@ -69,6 +69,26 @@ public class FileController {
         return ApiResult.T(resultMap);
     }
 
+    /**
+     * 本地融图接口
+     * @param file
+     * @param bgKey
+     * @return 融合后图片 url 和二维码 url
+     */
+    @PostMapping("/photo2")
+    public ApiResult uploadPhotoToGetLocalMergePhoto(@RequestParam("file") MultipartFile file, @RequestParam("other") String bgKey) {
+        log.info(">>>>>>>>>>>>>> 进入本地图片融合接口");
+        long startTime = System.currentTimeMillis();
+        FileRecordEntity photo = fileRecordService.getLocalMergePhotoUrl(file, bgKey, apiUrl, downloadUrl);
+        FileRecordEntity qrCode = fileRecordService.getQrCodeUrl(photo.getFileUrl(), downloadUrl);
+        // 保存结果进行返回
+        HashMap<String, Object> resultMap = new HashMap<>();
+        resultMap.put("mergedPhoto", photo);
+        resultMap.put("qrCode", qrCode);
+        log.info("<<<<<<<<<<<<<<< 退出图片融合接口 用时：" + (System.currentTimeMillis()-startTime) + "ms");
+        return ApiResult.T(resultMap);
+    }
+
 
     /**
      * 上传贴纸进行融合

@@ -289,6 +289,56 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
         }
     }
 
+    /**
+     * 本地融图接口
+     * @param multipartFile
+     * @param bgKey
+     * @param apiUrl
+     * @param downloadUrl
+     * @return
+     */
+    @Override
+    public FileRecordEntity getLocalMergePhotoUrl(MultipartFile multipartFile, String bgKey, String apiUrl, String downloadUrl) {
+        if(StringUtils.isEmpty(bgKey) || multipartFile.isEmpty()) {
+            throw new BusinessException("-1", "参数错误，背景图或原图为空");
+        }
+        String bgName = bgKey.replace("jpg", "png");
+        try {
+            // 上传图片
+            BufferedImage uploadBufferedImage = ImageIO.read(multipartFile.getInputStream());
+            // 获取上传图片尺寸
+            log.info("上传图片的尺寸：with = " + uploadBufferedImage.getWidth() + " height = " + uploadBufferedImage.getHeight());
+            // 获取画布
+            Graphics2D canvas = uploadBufferedImage.createGraphics();
+            // 获取背景图片
+            try {
+                log.info("背景图片名称 >> ：" + bgName);
+                BufferedImage bgBufferImage = (BufferedImage) baseCache.getTenHoursCache().get(bgName, () -> {
+                    String tagFilePath = "static/" + bgName;
+                    log.info("图片路径 >> ：" + tagFilePath);
+                    // 获取静态背景图片
+                    ClassPathResource classPathResource = new ClassPathResource(tagFilePath);
+                    BufferedImage bufferedImage = ImageIO.read(classPathResource.getInputStream());
+                    return bufferedImage;
+                });
+                // 背景图片尺寸
+                log.info("背景图片尺寸  width = [{}], height = [{}] >> " , bgBufferImage.getWidth(), bgBufferImage.getHeight());
+                // 绘制上传图片到背景图
+                canvas.drawImage(bgBufferImage, 0, 0, null);
+                // 释放图形上下文使用的系统资源
+                canvas.dispose();
+                // 输出图片到本地
+                return saveBufferImageToLocalServer(bgBufferImage, downloadUrl);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new BusinessException("-1", "获取背景图片失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BusinessException("-1", e.getMessage());
+        }
+    }
+
 
     private String generateFileRootDir() {
         String os = System.getProperty("os.name");
