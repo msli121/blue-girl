@@ -1,26 +1,18 @@
 <template>
-<div>
   <div>
-    <el-upload
-        class="upload-demo"
-        action="https://jsonplaceholder.typicode.com/posts/"
-        :on-preview="handlePreview"
-        :on-remove="handleRemove"
-        :before-remove="beforeRemove"
-        :limit="1"
-        :on-exceed="handleExceed"
-        :file-list="fileList">
-      <el-button size="small" type="primary">点击上传</el-button>
-    </el-upload>
+    <iframe id="flash22"
+            align="center" width="338" height="564"
+            src="http://sda.4399.com/4399swf/upload_swf/ftp31/gamehwq/20200310/07/index.htm"
+            frameborder="no"
+            border="0" marginwidth="0" marginheight="0" scrolling="no" style="width: 714px; height: 1191px;"></iframe>
   </div>
-</div>
 </template>
 
 <script>
 export default {
   data() {
     return {
-      fileList: [{name: 'food.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}, {name: 'food2.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}]
+
     };
   },
   methods: {

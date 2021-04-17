@@ -6,7 +6,7 @@ switch (process.env.NODE_ENV) { //注意变量名是自定义的
     break;
   case 'production':
     // 生产环境url
-    // apiBaseUrl = "https://www.performercn.com/ai";
+    // apiBaseUrl = "https://www.ai.performercn.com/api";
     apiBaseUrl = "https://www.performercn.com/api";
     break;
 }

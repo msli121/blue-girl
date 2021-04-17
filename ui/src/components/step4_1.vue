@@ -171,9 +171,14 @@ export default {
           { fullscreen: true },
       );
       // 发起调用请求
-      let url = apiBaseUrl + "/file/photo2";
-      axios
-        .post(url, formData, {
+      let url = "";
+      if(apiBaseUrl.indexOf("ai") > 0) {
+        url = apiBaseUrl + "/file/photo";
+      } else {
+        url = apiBaseUrl + "/file/photo2";
+      }
+      console.log("url ", url);
+      axios.post(url, formData, {
           "Content-Type": "multipart/form-data",
         }).then((res) => {
           if (res.data.flag === "T") {
