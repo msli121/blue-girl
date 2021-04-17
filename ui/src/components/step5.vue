@@ -8,7 +8,6 @@
       <!--      ;position: absolute;top: 40%-->
       <vue-drag-resize v-for="item in existUrlList" :key="item.tempID" :x="item.leftStart" :y="item.topStart" @dragstop="(event) => doEnd(event,item)">
         <el-image style="position:absolute;width: 300px;height: 300px;padding: 5px"
-
                   :src="item.url"
                   :fit="imageFit"
         ></el-image>
@@ -254,6 +253,13 @@ export default {
       top: 15px;
     }
   }
-
+}
+/deep/ .vdr.active:before {
+  outline: none !important;
+  border: none !important;
+}
+/deep/ .vdr.active {
+  width: 0 !important;
+  height: 0 !important;
 }
 </style>

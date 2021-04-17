@@ -197,12 +197,6 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
                     });
                     // 贴纸尺寸
                     log.info("贴纸尺寸  width = [{}], height = [{}] >> " , tagImage.getWidth(), tagImage.getHeight());
-                    // 缩小一半
-//                    int width = (int) (tagImage.getWidth()*0.6);
-//                    int height = (int) (tagImage.getHeight()*0.6);
-//                    int width = 180;
-//                    int height = 250;
-//                    Image scaledImage = tagImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
                     // 绘制 tag 图到基本图
                     canvas.drawImage(tagImage, tagItem.getLeftStart(), tagItem.getTopStart(), null);
                 } catch (Exception e) {
