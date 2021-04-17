@@ -328,7 +328,7 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
                 // 释放图形上下文使用的系统资源
                 canvas.dispose();
                 // 输出图片到本地
-                return saveBufferImageToLocalServer(bgBufferImage, downloadUrl);
+                return saveBufferImageToLocalServer(uploadBufferedImage, downloadUrl);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new BusinessException("-1", "获取背景图片失败");
