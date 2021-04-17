@@ -1,7 +1,7 @@
 <template>
   <div class="game-bg">
     <el-image
-         style="height: 100%; width: 100%;z-index: 9"
+         style="height: 100%; width: 100%;"
         :src="bgUrl"
         :fit="fit">
     </el-image>
@@ -14,7 +14,7 @@
       </div>
     </div>
     <iframe id="flash22" class="game-window"
-            align="center" width="338" height="564"
+            align="center"
             src="https://sda.4399.com/4399swf/upload_swf/ftp31/gamehwq/20200310/07/index.htm"
             frameborder="no"
             border="0" marginwidth="0" marginheight="0" scrolling="no" style="width: 714px; height: 1191px;"></iframe>
@@ -52,7 +52,7 @@ export default {
   height: 67% !important;
 }
 .confirm-panel {
-  z-index: 99;
+  z-index: 1;
   text-align: center;
   position: absolute;
   bottom: 2%;
