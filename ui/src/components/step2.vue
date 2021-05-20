@@ -8,11 +8,12 @@
 </template>
 
 <script>
+
 export default {
   name: "step1",
   data() {
     return {
-      url: require("../assets/step-1-bg.jpg"),
+      url:  require("@/assets/step_2_bg.jpg"),
       fit: "fill"
     };
   },

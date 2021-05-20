@@ -1,13 +1,13 @@
 <template>
-  <el-carousel :interval="3000"
-               :autoplay="false"
+  <el-carousel :interval="5000"
+               :autoplay="true"
                arrow="always"
                trigger="click">
     <el-carousel-item
         v-for="item in cardList"
                       :key="item.id">
       <img
-          @click="handleStepClick(item.name)"
+          @click="handleStepClick(item)"
           ref="imgH"
           style="width: 100%;"
           class="medium"
@@ -32,35 +32,33 @@ export default {
     this.cardList = [
       {
         id: 1,
-        name: "dzq_2.png",
-        value: require("../assets/step3_overall/dzq_2.jpg")
+        name: "scene_1.png",
+        value: require("@/assets/scene_origin/scene_1.png")
       },
       {
         id: 2,
-        name: "dzq_1.jpg",
-        value: require("../assets/step3_overall/dzq_1.jpg")
+        name: "scene_2.png",
+        value: require("@/assets/scene_origin/scene_2.png")
       },
       {
         id: 3,
-        name: "dzq_3.png",
-        value: require("../assets/step3_overall/dzq_3.jpg")
-      },
-      {
-        id: 4,
-        name: "dzq_4.jpg",
-        value: require("../assets/step3_overall/dzq_4.jpg")
+        name: "scene_3.png",
+        value: require("@/assets/scene_origin/scene_3.png")
       }
     ];
   },
   methods: {
     imgLoad() {
+      console.log("图像加载完毕");
       this.$nextTick(() => {
         this.imgHeight = `${this.$refs.imgH[0].height}px`;
         // console.log(this.imgHeight)
       });
     },
-    handleStepClick(name) {
-      this.$router.push({ path:'/step4', query: {"name": name}});
+    handleStepClick(item) {
+      this.$router.push({
+        path: '/step4_1',
+        query: {name: item.name}});
     },
   },
   mounted() {
@@ -73,7 +71,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .el-carousel__item h3 {
   color: #475669;
   font-size: 14px;
@@ -90,18 +88,26 @@ export default {
   height: 100%;
 }
 .el-carousel{
-  height: 100%;
+  height: 100% !important;
   .el-carousel__container{
     height: 100% !important;
     img {
       height: 100%!important;
     }
     .el-carousel__arrow{
-      background: #8664ed;
-      box-shadow: white 0 0 10px;
+      //background: #8664ed;
+      //box-shadow: #00489a 0 0 10px;
+      color: #0178ff;
+      background-color: rgba(255,255,255,0);
       width: 76px;
       height: 76px;
-      font-size: 36px;
+      >i{
+        font-size: 72px;
+        font-weight: bolder;
+        /*&:before{
+          box-shadow: #00489a 0 0 10px;
+        }*/
+      }
     }
   }
 }

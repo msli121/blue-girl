@@ -16,6 +16,8 @@ public interface FileRecordService {
 
     FileRecordEntity getMergedPhotoUrl(MultipartFile multipartFile, String bgKey, String apiUrl, String downloadUrl);
 
+    FileRecordEntity getLocalMergePhotoUrl(MultipartFile multipartFile, String bgKey, String apiUrl, String downloadUrl);
+
     FileRecordEntity getQrCodeUrl(String photoUrl, String downloadUrl);
 
     FileRecordEntity getMergedPhotoWithTags(TagMergeRequest request, String downloadUrl);

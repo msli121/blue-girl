@@ -12,8 +12,9 @@
         <div class="eight common"></div>
       </div>
       <div>
-        <div class="self-progress">
-          <el-progress :percentage="processNumber"></el-progress>
+        <div class="self-progress" style="color: white">
+          {{processState}}
+<!--          <el-progress :percentage="processNumber"></el-progress>-->
         </div>
       </div>
     </div>
@@ -21,66 +22,31 @@
 </template>
 
 <script>
-  import imgPreloaderList from '@/config/imgPreloaderList.js';
-export default {
+  import imgPreloaderList from "../config/imgPreloaderList.js";
+  import {imgsPreloader} from "../config/imgPreloader"
+
+  export default {
   data() {
     return {
       processNumber: 0,
+      processState: '加载中...'
     };
   },
-  mounted() {
-    let that = this;
-    this.sleep(4000).then(() => {
-      that.loadingPicture();
-    })
+  created() {
+    this.loadImg()
   },
   methods: {
-    sleep(ms) {
-      return new Promise(resolve =>
-          setTimeout(resolve, ms)
-      )
-    },
-    loadingPicture() {
-      // let that = this;
-      (async () => {
-        await this.imgsPreloader(imgPreloaderList);
-        // 跳转页面
-
-        console.log("跳转页面")
-        await this.$router.replace({path: "/step1"});
-      })();
-    },
-    imgPreloader(url) {
-      return new Promise((resolve, reject) => {
-        let image = new Image();
-        image.onload = () => {
-          resolve();
-        };
-        image.onerror = () => {
-          reject();
-        };
-        image.src = url;
-      });
-    },
-
-    imgsPreloader(imgs) {
-      let that = this;
-      let processItem = 0;
-      if(imgs.length > 0) {
-        this.processNumber = 0;
-        processItem = 100 / imgs.length;
-      } else {
+    loadImg(){
+      const res = imgsPreloader(imgPreloaderList);
+      console.log('开始渲染---渲染中。。。');
+      this.processNumber = 0;
+      this.$router.push({path: "/game"});
+      res.then(val=>{
         this.processNumber = 100;
-      }
-      let promiseArr = [];
-      imgs.forEach(element => {
-        promiseArr.push(this.imgPreloader(element));
-        that.processNumber = that.processNumber + processItem;
-        if(that.processNumber > 100) {
-          that.processNumber = 100;
-        }
-      });
-      return Promise.all(promiseArr);
+        console.log('渲染成功');
+        this.processState = '加载完成';
+        console.log(23, val)//['图片加载成功', '图片加载成功'];
+      })
     }
   }
 }

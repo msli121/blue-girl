@@ -35,23 +35,16 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
     @Autowired
     private BaseCache baseCache;
 
-    private static HashMap<String, String> imageContentType=new HashMap<>();
+    private static HashMap<String, String> imageContentType= new HashMap<>();
 
     static {
         imageContentType.put("jpg","image/jpeg");
-
         imageContentType.put("jpeg","image/jpeg");
-
         imageContentType.put("png","image/png");
-
         imageContentType.put("tif","image/tiff");
-
         imageContentType.put("tiff","image/tiff");
-
         imageContentType.put("ico","image/x-icon");
-
         imageContentType.put("bmp","image/bmp");
-
         imageContentType.put("gif","image/gif");
     }
 
@@ -67,21 +60,44 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
 
             response.setHeader("Pragma", "no-cache");
 
-            response.setContentType("image/jpeg");
+            response.setContentType("image/png");
 
             try {
-                File image = new File(fileRecord.getLocalAddress());
-                FileInputStream inputStream = new FileInputStream(image);
-                int length = inputStream.available();
-                byte data[] = new byte[length];
-                response.setContentLength(length);
-                String fileName = image.getName();
+                File originFile = new File(fileRecord.getLocalAddress());
+                BufferedImage originBufferImage = ImageIO.read(originFile);
+                // 原图尺寸
+                int originWidth = originBufferImage.getWidth();
+                int originHeight = originBufferImage.getHeight();
+                // 获取缩放后的图片
+                int newWidth = (int) (originWidth * 0.5);
+                int newHeight = (int) (originHeight * 0.5);
+                Image scaledImage = originBufferImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+                // 构建新图流
+                BufferedImage newBufferImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+                Graphics2D canvas = newBufferImage.createGraphics();
+                // 绘画新图
+                canvas.drawImage(scaledImage, 0, 0, null);
+                // 释放画布资源
+                canvas.dispose();
+                // 图片写入输出流中
+                String fileName = originFile.getName();
                 String fileType = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+                fileType = StringUtils.isEmpty(fileType) ? "png" : fileType;
                 response.setContentType(imageContentType.get(fileType));
-                inputStream.read(data);
-                OutputStream toClient = response.getOutputStream();
-                toClient.write(data);
-                toClient.flush();
+                log.info("下载图片 >> 内容写入输出流中 >> 文件名：[{}] 文件类型：[{}]", fileName, fileType);
+                ImageIO.write(newBufferImage, fileType, response.getOutputStream());
+//                File image = new File(fileRecord.getLocalAddress());
+//                FileInputStream inputStream = new FileInputStream(image);
+//                int length = inputStream.available();
+//                byte data[] = new byte[length];
+//                response.setContentLength(length);
+//                String fileName = image.getName();
+//                String fileType = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+//                response.setContentType(imageContentType.get(fileType));
+//                inputStream.read(data);
+//                OutputStream toClient = response.getOutputStream();
+//                toClient.write(data);
+//                toClient.flush();
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new BusinessException("-1", "图片不存在");
@@ -182,6 +198,7 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
         try {
             // 主要图片
             BufferedImage mainImage = ImageIO.read(mainFile);
+            log.info("上传图片尺寸 width = [{}], height = [{}] >> ", mainImage.getWidth(), mainImage.getHeight());
             // 生成画布
             Graphics2D canvas = mainImage.createGraphics();
             request.getTags().forEach(tagItem -> {
@@ -194,6 +211,8 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
                         BufferedImage bufferedImage = ImageIO.read(classPathResource.getInputStream());
                         return bufferedImage;
                     });
+                    // 贴纸尺寸
+                    log.info("贴纸尺寸  width = [{}], height = [{}] >> " , tagImage.getWidth(), tagImage.getHeight());
                     // 绘制 tag 图到基本图
                     canvas.drawImage(tagImage, tagItem.getLeftStart(), tagItem.getTopStart(), null);
                 } catch (Exception e) {
@@ -224,6 +243,10 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
             throw new BusinessException("-1", "参数错误，背景图或原图为空");
         }
         try {
+            // 主要图片
+            BufferedImage mainImage = ImageIO.read(multipartFile.getInputStream());
+            // 获取上传图片尺寸
+            log.info("上传图片的尺寸：with = " + mainImage.getWidth() + " height = " + mainImage.getHeight());
             String backgroundBase64 = (String) baseCache.getTenHoursCache().get(bgKey, () -> {
                 String localPhotoUrl = "static/" + bgKey;
                 // 获取静态 logo 图片
@@ -253,6 +276,56 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
                 throw new BusinessException("-1", "模块返回出错");
             }
             return saveBase64FileToLocalServer(mergeResult, downloadUrl);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BusinessException("-1", e.getMessage());
+        }
+    }
+
+    /**
+     * 本地融图接口
+     * @param multipartFile
+     * @param bgKey
+     * @param apiUrl
+     * @param downloadUrl
+     * @return
+     */
+    @Override
+    public FileRecordEntity getLocalMergePhotoUrl(MultipartFile multipartFile, String bgKey, String apiUrl, String downloadUrl) {
+        if(StringUtils.isEmpty(bgKey) || multipartFile.isEmpty()) {
+            throw new BusinessException("-1", "参数错误，背景图或原图为空");
+        }
+        String bgName = bgKey.replace("jpg", "png");
+        try {
+            // 上传图片
+            BufferedImage uploadBufferedImage = ImageIO.read(multipartFile.getInputStream());
+            // 获取上传图片尺寸
+            log.info("上传图片的尺寸：with = " + uploadBufferedImage.getWidth() + " height = " + uploadBufferedImage.getHeight());
+            // 获取画布
+            Graphics2D canvas = uploadBufferedImage.createGraphics();
+            // 获取背景图片
+            try {
+                log.info("背景图片名称 >> ：" + bgName);
+                BufferedImage bgBufferImage = (BufferedImage) baseCache.getTenHoursCache().get(bgName, () -> {
+                    String tagFilePath = "static/" + bgName;
+                    log.info("图片路径 >> ：" + tagFilePath);
+                    // 获取静态背景图片
+                    ClassPathResource classPathResource = new ClassPathResource(tagFilePath);
+                    BufferedImage bufferedImage = ImageIO.read(classPathResource.getInputStream());
+                    return bufferedImage;
+                });
+                // 背景图片尺寸
+                log.info("背景图片尺寸  width = [{}], height = [{}] >> " , bgBufferImage.getWidth(), bgBufferImage.getHeight());
+                // 绘制上传图片到背景图
+                canvas.drawImage(bgBufferImage, 0, 0, null);
+                // 释放图形上下文使用的系统资源
+                canvas.dispose();
+                // 输出图片到本地
+                return saveBufferImageToLocalServer(uploadBufferedImage, downloadUrl);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new BusinessException("-1", "获取背景图片失败");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new BusinessException("-1", e.getMessage());

@@ -28,44 +28,48 @@
          :class="confirmPhoto?'p-confirm-photo':''"
          v-if="confirmPhoto">
       <!-- 重拍 -->
-      <el-button
-        style="font-size: 40px"
+      <div
+        style="font-size:20px; color:yellow; float:left;"
         @click="goStep3()"
-        circle
-        icon="el-icon-camera"
-        type="danger"
-      ></el-button>
+        >
+        <span>重拍</span>
+        <br/>
+        <span>REMAKE</span>
+      </div>
       <!-- 保存 -->
-      <el-button
-        style="font-size: 40px; margin-left: 30px"
+      <div
+        style="font-size:20px; color:white; float:right; margin-left:15px;"
         @click="go()"
-        circle
-        icon="el-icon-arrow-right"
-        type="success"
-      ></el-button>
+        >
+        <span>确认</span>
+        <br/>
+        <span>UPLOAD</span>
+      </div>
     </div>
     <div class="confirm" v-else>
       <!-- 拍照 -->
-      <el-button
-        style="font-size: 40px"
+      <div
+        style="font-size:20px; color:yellow;"
         @click="setImage()"
-        circle
-        icon="el-icon-camera"
-        type="primary"
-      ></el-button>
+        >
+        <span>确认</span>
+        <br/>
+        <span>CONFIRM</span>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import { Loading } from 'element-ui'
+import { Loading } from 'element-ui';
+import imgPreloaderList from "../config/imgPreloaderList.js";
 export default {
   name: "step4",
   data() {
     return {
-      videoWidth: 455,
-      videoHeight: 1000,
+      videoWidth: 1080,
+      videoHeight: 1920,
       imgSrc: "",
       thisCancas: null,
       thisContext: null,
@@ -103,7 +107,8 @@ export default {
     // 调用权限（打开摄像头功能）
     getCompetence() {
       this.confirmPhoto = false;
-      this.backgroundImg = require("../assets/" + this.bgName);
+      console.log("this.bgName", "../assets/scene_show/"+this.bgName);
+      this.backgroundImg = require("../assets/scene_show/"+this.bgName);
       document.getElementsByClassName("dzq_bg")[0].style.display = "inline";
       // console.log(document.getElementsByClassName("dzq_bg")[0].style.display);
 
