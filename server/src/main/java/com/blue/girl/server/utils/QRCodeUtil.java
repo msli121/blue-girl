@@ -176,19 +176,16 @@ public class QRCodeUtil {
         graph.dispose();
     }
 
-
     public static void encode(String content, String imgPath, String destPath, boolean needCompress) throws Exception {
         BufferedImage image = QRCodeUtil.createImage(content, imgPath, needCompress);
         mkdirs(destPath);
         ImageIO.write(image, FORMAT_NAME, new File(destPath));
     }
 
-
     public static BufferedImage encode(String content, String imgPath, boolean needCompress) throws Exception {
         BufferedImage image = QRCodeUtil.createImage(content, imgPath, needCompress);
         return image;
     }
-
 
     public static void mkdirs(String destPath) {
         File file = new File(destPath);
@@ -198,11 +195,16 @@ public class QRCodeUtil {
         }
     }
 
-
     public static void encode(String content, String imgPath, OutputStream output, boolean needCompress)
             throws Exception {
         BufferedImage image = QRCodeUtil.createImage(content, imgPath, needCompress);
         ImageIO.write(image, FORMAT_NAME, output);
+    }
+
+    public static void encode(String content, File file, boolean needCompress)
+            throws Exception {
+        BufferedImage image = QRCodeUtil.createImage(content, "", needCompress);
+        ImageIO.write(image, FORMAT_NAME, file);
     }
 
     public static void encode(String content, InputStream inputStream, OutputStream output, boolean needCompress)
@@ -221,5 +223,10 @@ public class QRCodeUtil {
     public static void encode(String content, OutputStream output) throws Exception {
         QRCodeUtil.encode(content, "", output, false);
     }
+
+    public static void encode(String content, File file) throws Exception {
+        QRCodeUtil.encode(content, file, false);
+    }
+
 
 }
