@@ -175,7 +175,8 @@ export default {
       if(apiBaseUrl.indexOf("ai") > 0) {
         url = apiBaseUrl + "/file/photo";
       } else {
-        url = apiBaseUrl + "/file/photo2";
+        // url = apiBaseUrl + "/file/photo2";
+        url = apiBaseUrl + "/file/photo";
       }
       console.log("url ", url);
       axios.post(url, formData, {

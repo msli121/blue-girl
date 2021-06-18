@@ -273,7 +273,7 @@ public class FileRecordServiceImpl extends BaseService implements FileRecordServ
             log.info("========== 图片融合接口完毕 用时：" + (System.currentTimeMillis() - startTime) + "ms");
             // 获取可访问的文件 url
             if(null == mergeResult || mergeResult.contains("error")) {
-                throw new BusinessException("-1", "模块返回出错");
+                throw new BusinessException("-1", "AI融图模块出错");
             }
             return saveBase64FileToLocalServer(mergeResult, downloadUrl);
         } catch (Exception e) {
